@@ -1,0 +1,6 @@
+services:
+    App\Common\Application\Query\QueryBus:
+        public: true
+        arguments:
+          [ '@messenger.routable_message_bus' ]
+
