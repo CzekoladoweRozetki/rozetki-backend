@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Test\Application\Event;
 
-use App\Common\Application\Command\CommandBus;
 use App\Common\Application\Event\EventBus;
-use App\Test\Application\Command\TestCommand;
-use App\Test\Application\Command\TestCommandHandler;
 use App\Test\Application\Event\TestEvent;
 use App\Test\Application\Event\TestEventHandler;
 use Psr\Log\LoggerInterface;
