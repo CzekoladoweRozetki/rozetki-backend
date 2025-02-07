@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Test\Infrastructure\Api;
+namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Factory\TestFactory;
@@ -10,14 +10,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TestResourceTest extends ApiTestCase
 {
-//    public function testGetCollection(): void
-//    {
-//        $client = static::createClient();
-//        $client->request('GET', '/tests');
-//
-//        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-//        $this->assertJson($client->getResponse()->getContent());
-//    }
+    public function testGetCollection(): void
+    {
+        $client = static::createClient();
+
+        $tests = TestFactory::createMany(10);
+
+        $response = $client->request('GET', '/api/tests');
+
+        //dd($response->getContent());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertJsonContains([
+            'totalItems' => 10,
+        ]);
+    }
 
     public function testGet(): void
     {

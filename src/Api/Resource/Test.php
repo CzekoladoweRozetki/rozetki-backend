@@ -11,12 +11,13 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Api\Provider\TestCollectionProvider;
 use App\Api\Provider\TestProvider;
 
 #[ApiResource(
     operations: [
         new Get(provider: TestProvider::class),
-        new GetCollection(),
+        new GetCollection(provider: TestCollectionProvider::class),
         new Post(),
         new Patch(),
         new Delete(),
