@@ -11,6 +11,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Api\DTO\Test\TestInputDTO;
+use App\Api\Processor\Test\TessCreateProcessor;
 use App\Api\Provider\TestCollectionProvider;
 use App\Api\Provider\TestProvider;
 
@@ -18,7 +20,7 @@ use App\Api\Provider\TestProvider;
     operations: [
         new Get(provider: TestProvider::class),
         new GetCollection(provider: TestCollectionProvider::class),
-        new Post(),
+        new Post(input: TestInputDTO::class, processor: TessCreateProcessor::class),
         new Patch(),
         new Delete(),
     ],
@@ -27,7 +29,7 @@ use App\Api\Provider\TestProvider;
 class Test
 {
     public function __construct(
-        #[ApiProperty(identifier: true)]
+        #[ApiProperty(identifier: true,)]
         public string $id,
         public string $name,
     ) {

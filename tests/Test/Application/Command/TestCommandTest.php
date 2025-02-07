@@ -7,9 +7,10 @@ namespace App\Tests\Test\Application\Command;
 use App\Common\Application\Command\CommandBus;
 use App\Test\Application\Command\TestCommand;
 use App\Test\Application\Command\TestCommandHandler;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\Uuid;
 
 class TestCommandTest extends KernelTestCase
 {
@@ -26,10 +27,14 @@ class TestCommandTest extends KernelTestCase
             ->method('info')
             ->with('Test command executed');
 
-        $handler = new TestCommandHandler($logger);
-        $container->set(TestCommandHandler::class, $handler);
+        $container->set(LoggerInterface::class, $logger);
 
-        $command = new TestCommand();
+        $handler = $container->get(TestCommandHandler::class);
+
+        $command = new TestCommand(
+            id: Uuid::v4(),
+            name: 'Test Name'
+        );
         $commandBus->dispatch($command);
     }
 }

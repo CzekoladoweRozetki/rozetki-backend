@@ -41,17 +41,19 @@ class TestResourceTest extends ApiTestCase
         ]);
     }
 
-//    public function testPost(): void
-//    {
-//        $client = static::createClient();
-//        $client->request('POST', '/tests', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
-//            'id' => '1',
-//            'name' => 'Test Name',
-//        ]));
-//
-//        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-//        $this->assertJson($client->getResponse()->getContent());
-//    }
+    public function testPost(): void
+    {
+        $client = static::createClient();
+        $client->request('POST', '/api/tests', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'name' => 'Test Name',
+            ]
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJson($client->getResponse()->getContent());
+    }
 //
 //    public function testPatch(): void
 //    {
