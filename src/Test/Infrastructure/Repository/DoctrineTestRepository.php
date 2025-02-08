@@ -10,6 +10,9 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @extends ServiceEntityRepository<Test>
+ */
 class DoctrineTestRepository extends ServiceEntityRepository implements TestRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -25,6 +28,12 @@ class DoctrineTestRepository extends ServiceEntityRepository implements TestRepo
     public function save(Test $test): void
     {
         $this->getEntityManager()->persist($test);
+        $this->getEntityManager()->flush();
+    }
+
+    public function remove(Test $test): void
+    {
+        $this->getEntityManager()->remove($test);
         $this->getEntityManager()->flush();
     }
 }

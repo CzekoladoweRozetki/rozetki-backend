@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Api\Provider;
+namespace App\Test\Infrastructure\Api\Provider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Api\Resource\Test;
 use App\Common\Application\Query\QueryBus;
 use App\Test\Application\Query\GetAllTestQuery;
 use App\Test\Application\Query\TestDTO;
+use App\Test\Infrastructure\Api\Resource\Test;
 
 class TestCollectionProvider implements ProviderInterface
 {

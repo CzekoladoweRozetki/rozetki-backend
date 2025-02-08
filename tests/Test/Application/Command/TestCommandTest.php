@@ -19,15 +19,16 @@ class TestCommandTest extends KernelTestCase
         self::bootKernel(['environment' => 'test']);
         $container = self::getContainer();
 
-        $messageBus = $container->get(MessageBusInterface::class);
-        $commandBus = new CommandBus($messageBus);
-
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
             ->method('info')
             ->with('Test command executed');
 
         $container->set(LoggerInterface::class, $logger);
+
+        $messageBus = $container->get(MessageBusInterface::class);
+        $commandBus = new CommandBus($messageBus);
+
 
         $handler = $container->get(TestCommandHandler::class);
 

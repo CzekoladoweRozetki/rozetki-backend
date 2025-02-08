@@ -13,4 +13,6 @@ interface TestRepository
 
     public function save(Test $test): void;
 
+    public function remove(Test $test);
+
 }

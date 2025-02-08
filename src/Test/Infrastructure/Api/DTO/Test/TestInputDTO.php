@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Api\DTO\Test;
+namespace App\Test\Infrastructure\Api\DTO\Test;
 
 readonly class TestInputDTO
 {

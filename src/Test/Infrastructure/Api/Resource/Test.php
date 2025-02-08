@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Api\Resource;
+namespace App\Test\Infrastructure\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -11,18 +11,20 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Api\DTO\Test\TestInputDTO;
-use App\Api\Processor\Test\TessCreateProcessor;
-use App\Api\Provider\TestCollectionProvider;
-use App\Api\Provider\TestProvider;
+use App\Test\Infrastructure\Api\DTO\Test\TestInputDTO;
+use App\Test\Infrastructure\Api\Processor\Test\TessCreateProcessor;
+use App\Test\Infrastructure\Api\Processor\Test\TestDeleteProcessor;
+use App\Test\Infrastructure\Api\Processor\Test\TestUpdateProcessor;
+use App\Test\Infrastructure\Api\Provider\TestCollectionProvider;
+use App\Test\Infrastructure\Api\Provider\TestProvider;
 
 #[ApiResource(
     operations: [
         new Get(provider: TestProvider::class),
         new GetCollection(provider: TestCollectionProvider::class),
         new Post(input: TestInputDTO::class, processor: TessCreateProcessor::class),
-        new Patch(),
-        new Delete(),
+        new Patch(provider: TestProvider::class, processor: TestUpdateProcessor::class),
+        new Delete(processor: TestDeleteProcessor::class, provider: TestProvider::class),
     ],
 
 )]

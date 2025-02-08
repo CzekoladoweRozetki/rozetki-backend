@@ -7,4 +7,10 @@ api_platform:
             vary: [ 'Content-Type', 'Authorization', 'Origin' ]
     mapping:
         paths:
-            - '%kernel.project_dir%/src/Api/Resource'
+            - '%kernel.project_dir%/src/Test/Infrastructure/Api/Resource'
+    formats:
+        json:
+            mime_types: [ 'application/json' ]
+        jsonld:
+            mime_types: [ 'application/ld+json' ]
+
