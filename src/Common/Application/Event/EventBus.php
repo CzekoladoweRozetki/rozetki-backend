@@ -8,14 +8,12 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class EventBus
 {
     public function __construct(
-        private MessageBusInterface $eventBus
-    )
-    {
+        private MessageBusInterface $eventBus,
+    ) {
     }
 
     public function dispatch(Event $event): void
     {
         $this->eventBus->dispatch($event);
     }
-
 }

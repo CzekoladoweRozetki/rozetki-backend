@@ -12,14 +12,14 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class UpdateTestCommandHandler
 {
     public function __construct(
-        private TestRepository $testRepository
+        private TestRepository $testRepository,
     ) {
     }
 
     public function __invoke(UpdateTestCommand $command): void
     {
         $test = $this->testRepository->findOneById($command->id);
-        if ($test === null) {
+        if (null === $test) {
             throw new EntityNotFound();
         }
 
@@ -27,5 +27,4 @@ class UpdateTestCommandHandler
 
         $this->testRepository->save($test);
     }
-
 }

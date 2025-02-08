@@ -12,5 +12,4 @@ readonly class TestCommand extends Command
         public string $name,
     ) {
     }
-
 }

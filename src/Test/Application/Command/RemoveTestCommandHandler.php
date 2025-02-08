@@ -12,18 +12,17 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class RemoveTestCommandHandler
 {
     public function __construct(
-        private TestRepository $testRepository
+        private TestRepository $testRepository,
     ) {
     }
 
     public function __invoke(RemoveTestCommand $command): void
     {
         $test = $this->testRepository->findOneById($command->id);
-        if ($test === null) {
+        if (null === $test) {
             throw new EntityNotFound();
         }
 
         $this->testRepository->remove($test);
     }
-
 }

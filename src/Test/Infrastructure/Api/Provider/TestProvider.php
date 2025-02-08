@@ -11,10 +11,13 @@ use App\Test\Application\Query\TestQuery;
 use App\Test\Infrastructure\Api\Resource\Test;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @implements ProviderInterface<Test>
+ */
 class TestProvider implements ProviderInterface
 {
     public function __construct(
-        private QueryBus $queryBus
+        private QueryBus $queryBus,
     ) {
     }
 

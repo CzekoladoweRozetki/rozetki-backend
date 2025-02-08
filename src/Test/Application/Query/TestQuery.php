@@ -13,5 +13,4 @@ readonly class TestQuery extends Query
         public Uuid $id,
     ) {
     }
-
 }

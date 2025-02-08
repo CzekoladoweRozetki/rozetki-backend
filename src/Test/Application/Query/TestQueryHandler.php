@@ -11,14 +11,14 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class TestQueryHandler
 {
     public function __construct(
-        private TestRepository $testRepository
+        private TestRepository $testRepository,
     ) {
     }
 
     public function __invoke(TestQuery $query): TestDTO
     {
         $test = $this->testRepository->findOneById($query->id);
+
         return new TestDTO($test->getId(), $test->getName());
     }
-
 }

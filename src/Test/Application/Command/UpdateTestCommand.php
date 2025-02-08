@@ -14,5 +14,4 @@ readonly class UpdateTestCommand extends Command
         public string $name,
     ) {
     }
-
 }

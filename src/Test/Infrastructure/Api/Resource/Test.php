@@ -26,15 +26,13 @@ use App\Test\Infrastructure\Api\Provider\TestProvider;
         new Patch(provider: TestProvider::class, processor: TestUpdateProcessor::class),
         new Delete(processor: TestDeleteProcessor::class, provider: TestProvider::class),
     ],
-
 )]
 class Test
 {
     public function __construct(
-        #[ApiProperty(identifier: true,)]
+        #[ApiProperty(identifier: true, )]
         public string $id,
         public string $name,
     ) {
     }
-
 }

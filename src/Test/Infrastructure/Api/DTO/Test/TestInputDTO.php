@@ -10,5 +10,4 @@ readonly class TestInputDTO
         public string $name,
     ) {
     }
-
 }

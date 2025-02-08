@@ -6,7 +6,6 @@ namespace App\Common\Domain\Exception;
 
 class EntityNotFound extends \Exception
 {
-
     public function __construct()
     {
         parent::__construct('Entity not found');

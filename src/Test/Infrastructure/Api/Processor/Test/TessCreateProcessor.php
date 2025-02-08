@@ -9,13 +9,16 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Common\Application\Command\CommandBus;
 use App\Test\Application\Command\TestCommand;
 use App\Test\Infrastructure\Api\DTO\Test\TestInputDTO;
+use App\Test\Infrastructure\Api\Resource\Test;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @implements ProcessorInterface<TestInputDTO, Test>
+ */
 class TessCreateProcessor implements ProcessorInterface
 {
-
     public function __construct(
-        private CommandBus $commandBus
+        private CommandBus $commandBus,
     ) {
     }
 
@@ -31,6 +34,6 @@ class TessCreateProcessor implements ProcessorInterface
 
         $this->commandBus->dispatch($command);
 
-        return $data;
+        return new Test($command->id->toString(), $command->name);
     }
 }

@@ -13,7 +13,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class TestEventTest extends KernelTestCase
 {
-    public function testDispatch()
+    public function testDispatch(): void
     {
         self::bootKernel(['environment' => 'test']);
         $container = self::getContainer();

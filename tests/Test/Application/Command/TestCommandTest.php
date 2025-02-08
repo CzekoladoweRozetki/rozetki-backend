@@ -14,9 +14,9 @@ use Symfony\Component\Uid\Uuid;
 
 class TestCommandTest extends KernelTestCase
 {
-    public function testDispatch()
+    public function testDispatch(): void
     {
-        self::bootKernel(['environment' => 'test']);
+        self::bootKernel();
         $container = self::getContainer();
 
         $logger = $this->createMock(LoggerInterface::class);
@@ -28,7 +28,6 @@ class TestCommandTest extends KernelTestCase
 
         $messageBus = $container->get(MessageBusInterface::class);
         $commandBus = new CommandBus($messageBus);
-
 
         $handler = $container->get(TestCommandHandler::class);
 

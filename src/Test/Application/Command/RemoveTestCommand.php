@@ -13,5 +13,4 @@ readonly class RemoveTestCommand extends Command
         public Uuid $id,
     ) {
     }
-
 }

@@ -21,8 +21,6 @@ class TestResourceTest extends ApiTestCase
 
         $response = $client->request('GET', '/api/tests');
 
-        //dd($response->getContent());
-
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
             'totalItems' => 10,
@@ -35,7 +33,7 @@ class TestResourceTest extends ApiTestCase
 
         $test = TestFactory::createOne();
 
-        $client->request('GET', '/api/tests/' . $test->getId()->toString());
+        $client->request('GET', '/api/tests/'.$test->getId()->toString());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
@@ -51,7 +49,7 @@ class TestResourceTest extends ApiTestCase
             'headers' => ['Content-Type' => 'application/json'],
             'json' => [
                 'name' => 'Test Name',
-            ]
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -62,11 +60,11 @@ class TestResourceTest extends ApiTestCase
     {
         $test = TestFactory::createOne();
         $client = static::createClient();
-        $client->request('PATCH', '/api/tests/' . $test->getId()->toString(), [
+        $client->request('PATCH', '/api/tests/'.$test->getId()->toString(), [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'name' => 'New Name',
-            ]
+            ],
         ]);
 
         $updatedTest = TestFactory::repository()->find($test->getId());
@@ -80,8 +78,8 @@ class TestResourceTest extends ApiTestCase
         $test = TestFactory::createOne();
 
         $client = static::createClient();
-        $url = '/api/tests/' . $test->getId()->toString();
-        $client->request('DELETE', '/api/tests/' . $test->getId()->toString());
+        $url = '/api/tests/'.$test->getId()->toString();
+        $client->request('DELETE', '/api/tests/'.$test->getId()->toString());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
         $this->assertNull(TestFactory::repository()->find($test->getId()));

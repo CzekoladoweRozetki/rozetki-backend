@@ -13,5 +13,4 @@ readonly class TestDTO
         public string $name,
     ) {
     }
-
 }

@@ -14,7 +14,7 @@ class TestCommandHandler
 {
     public function __construct(
         private LoggerInterface $logger,
-        private TestRepository $testRepository
+        private TestRepository $testRepository,
     ) {
     }
 
@@ -29,5 +29,4 @@ class TestCommandHandler
 
         $this->logger->info('Test command executed');
     }
-
 }

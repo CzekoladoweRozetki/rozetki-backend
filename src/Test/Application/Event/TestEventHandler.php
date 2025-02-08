@@ -11,13 +11,12 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class TestEventHandler
 {
     public function __construct(
-        private LoggerInterface $logger
-    )
-    {
+        private LoggerInterface $logger,
+    ) {
     }
+
     public function __invoke(TestEvent $event): void
     {
         $this->logger->info('Test event executed');
     }
-
 }

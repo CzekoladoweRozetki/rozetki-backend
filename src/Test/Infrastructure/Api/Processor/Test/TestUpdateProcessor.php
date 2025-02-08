@@ -11,10 +11,13 @@ use App\Test\Application\Command\UpdateTestCommand;
 use App\Test\Infrastructure\Api\Resource\Test;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @implements ProcessorInterface<Test, Test>
+ */
 class TestUpdateProcessor implements ProcessorInterface
 {
     public function __construct(
-        private CommandBus $commandBus
+        private CommandBus $commandBus,
     ) {
     }
 

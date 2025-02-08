@@ -8,5 +8,4 @@ use App\Common\Application\Query\Query;
 
 readonly class GetAllTestQuery extends Query
 {
-
 }

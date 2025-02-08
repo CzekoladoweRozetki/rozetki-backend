@@ -8,5 +8,4 @@ use App\Common\Domain\Event;
 
 readonly class TestEvent extends Event
 {
-
 }

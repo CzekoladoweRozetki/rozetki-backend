@@ -36,5 +36,4 @@ class Test
     {
         $this->name = $name;
     }
-
 }

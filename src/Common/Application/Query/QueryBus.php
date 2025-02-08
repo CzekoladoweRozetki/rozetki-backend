@@ -9,11 +9,17 @@ class QueryBus
 {
     use HandleTrait;
 
+    /**
+     * @phpstan-ignore-next-line property.onlyWritten
+     */
     private MessageBusInterface $messageBus;
+
     public function __construct(
-        private MessageBusInterface $queryBus
-    )
-    {
+        /**
+         * @phpstan-ignore-next-line property.onlyWritten
+         */
+        private MessageBusInterface $queryBus,
+    ) {
         $this->messageBus = $queryBus;
     }
 
@@ -21,5 +27,4 @@ class QueryBus
     {
         return $this->handle($query);
     }
-
 }
