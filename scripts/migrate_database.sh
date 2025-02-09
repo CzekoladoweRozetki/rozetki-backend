@@ -24,6 +24,7 @@ migrate_database() {
 
     # Drop the schema
     php bin/console doctrine:schema:drop --force $ENV_OPTION
+    echo "droping schema" $ENV_OPTION
 
     # Clear the migration table
     php bin/console doctrine:migrations:version --delete --all --no-interaction $ENV_OPTION
