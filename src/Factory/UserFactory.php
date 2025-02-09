@@ -8,9 +8,11 @@ use App\Auth\Domain\Entity\User;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
+/**
+ * @extends PersistentObjectFactory<User>
+ */
 class UserFactory extends PersistentObjectFactory
 {
-
     protected function defaults(): array|callable
     {
         return [

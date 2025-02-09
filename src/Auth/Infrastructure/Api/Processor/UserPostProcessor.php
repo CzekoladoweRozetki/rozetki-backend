@@ -18,7 +18,7 @@ use Symfony\Component\Uid\Uuid;
 class UserPostProcessor implements ProcessorInterface
 {
     public function __construct(
-        private CommandBus $commandBus
+        private CommandBus $commandBus,
     ) {
     }
 
@@ -31,7 +31,6 @@ class UserPostProcessor implements ProcessorInterface
         return new User(
             id: $command->id->toString(),
             email: $command->email,
-            password: $command->password
         );
     }
 }

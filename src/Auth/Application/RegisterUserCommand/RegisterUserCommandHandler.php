@@ -14,7 +14,7 @@ class RegisterUserCommandHandler
 {
     public function __construct(
         private UserRepository $userRepository,
-        private UserPasswordHasherInterface $passwordHasher
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -30,5 +30,4 @@ class RegisterUserCommandHandler
 
         $this->userRepository->save($user);
     }
-
 }

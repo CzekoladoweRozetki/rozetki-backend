@@ -46,6 +46,4 @@ class User implements PasswordAuthenticatedUserInterface
     {
         $this->password = $hashPassword;
     }
-
-
 }

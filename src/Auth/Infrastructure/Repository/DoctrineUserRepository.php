@@ -8,6 +8,7 @@ use App\Auth\Domain\Entity\User;
 use App\Auth\Domain\Repository\UserRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -34,5 +35,10 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
     {
         $this->getEntityManager()->remove($user);
         $this->getEntityManager()->flush();
+    }
+
+    public function getUserById(Uuid $id): ?User
+    {
+        return $this->find($id);
     }
 }
