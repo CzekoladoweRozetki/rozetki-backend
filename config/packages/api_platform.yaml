@@ -9,6 +9,7 @@ api_platform:
         paths:
             - '%kernel.project_dir%/src/Test/Infrastructure/Api/Resource'
             - '%kernel.project_dir%/src/Auth/Infrastructure/Api/Resource'
+            - '%kernel.project_dir%/src/Product/Infrastructure/Api/Resource'
     formats:
         json:
             mime_types: [ 'application/json' ]

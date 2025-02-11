@@ -38,6 +38,8 @@ class UserResourceTest extends ApiTestCase
 
         $client = static::createClient();
 
+        $client->loginUser($user);
+
         // Then, get the created user
         $response = $client->request('GET', '/api/users/'.$user->getId()->toString());
 
