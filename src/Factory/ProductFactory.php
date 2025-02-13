@@ -8,9 +8,11 @@ use App\Product\Domain\Entity\Product;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
+/**
+ * @extends PersistentProxyObjectFactory<Product>
+ */
 class ProductFactory extends PersistentProxyObjectFactory
 {
-
     protected function defaults(): array|callable
     {
         return [

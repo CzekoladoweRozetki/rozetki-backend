@@ -13,5 +13,4 @@ readonly class GetProductByIdQuery extends Query
         public Uuid $id,
     ) {
     }
-
 }

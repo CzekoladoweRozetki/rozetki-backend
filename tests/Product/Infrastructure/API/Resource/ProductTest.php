@@ -7,6 +7,8 @@ namespace App\Tests\Product\Infrastructure\API\Resource;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Factory\ProductFactory;
 use App\Factory\UserFactory;
+use App\Product\Domain\Entity\Product;
+use App\Product\Domain\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Test\Factories;
@@ -58,10 +60,11 @@ class ProductTest extends ApiTestCase
         $client->loginUser($user);
 
         // Create a product to retrieve
+        /** @var Product $product */
         $product = ProductFactory::createOne();
 
         // Step 1: Retrieve the product by ID
-        $response = $client->request('GET', '/api/products/' . $product->getId()->toString());
+        $response = $client->request('GET', '/api/products/'.$product->getId()->toString());
 
         // Step 2: Verify the response
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -70,5 +73,28 @@ class ProductTest extends ApiTestCase
             'name' => $product->getName(),
             'description' => $product->getDescription(),
         ]);
+    }
+
+    public function testDeleteProduct(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne();
+        $client->loginUser($user);
+
+        // Given: Create a product to delete
+        /** @var Product $product */
+        $product = ProductFactory::createOne();
+
+        // When: Send a DELETE request to remove the product
+        $response = $client->request('DELETE', '/api/products/'.$product->getId()->toString());
+
+        // Then: Verify the response and ensure the product is deleted
+        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+
+        $productRepository = self::getContainer()->get(ProductRepository::class);
+        $deletedProduct = $productRepository->findById($product->getId());
+
+        $this->assertNull($deletedProduct);
     }
 }

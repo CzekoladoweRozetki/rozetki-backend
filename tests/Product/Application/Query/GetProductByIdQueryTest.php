@@ -36,8 +36,6 @@ class GetProductByIdQueryTest extends KernelTestCase
         /** @var ProductDTO $productDTO */
         $productDTO = $this->queryBus->query($query);
 
-
-        $this->assertNotNull($productDTO);
         $this->assertEquals($product->getId(), $productDTO->id);
         $this->assertEquals($product->getName(), $productDTO->name);
         $this->assertEquals($product->getDescription(), $productDTO->description);

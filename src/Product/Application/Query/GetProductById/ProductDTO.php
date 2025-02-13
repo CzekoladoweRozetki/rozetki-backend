@@ -14,5 +14,4 @@ readonly class ProductDTO
         public string $description,
     ) {
     }
-
 }

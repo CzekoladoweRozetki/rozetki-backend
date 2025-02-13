@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class GetProductByIdQueryHandler
 {
     public function __construct(
-        private ProductRepository $productRepository
+        private ProductRepository $productRepository,
     ) {
     }
 
@@ -25,6 +25,4 @@ class GetProductByIdQueryHandler
             $product->getDescription()
         ) : null;
     }
-
-
 }

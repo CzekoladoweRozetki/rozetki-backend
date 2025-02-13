@@ -12,11 +12,13 @@ use App\Product\Application\Query\GetProductById\ProductDTO;
 use App\Product\Infrastructure\Api\Resource\Product;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @implements ProviderInterface<Product>
+ */
 class ProductSingleProvider implements ProviderInterface
 {
     public function __construct(
         private QueryBus $queryBus,
-
     ) {
     }
 
@@ -31,7 +33,7 @@ class ProductSingleProvider implements ProviderInterface
          */
         $product = $this->queryBus->query($query);
 
-        if ($product === null) {
+        if (null === $product) {
             return null;
         }
 
