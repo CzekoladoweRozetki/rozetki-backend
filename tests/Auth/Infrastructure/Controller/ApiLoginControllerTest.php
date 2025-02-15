@@ -30,7 +30,7 @@ class ApiLoginControllerTest extends WebTestCase
     {
         $this->client->request(
             'POST',
-            '/api/login',
+            '/login',
             [],
             [],
             [
@@ -49,7 +49,7 @@ class ApiLoginControllerTest extends WebTestCase
     {
         $this->client->request(
             'POST',
-            '/api/login',
+            '/login',
             [],
             [],
             [

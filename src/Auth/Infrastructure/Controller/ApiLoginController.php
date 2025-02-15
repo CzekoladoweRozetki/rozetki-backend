@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApiLoginController extends AbstractController
 {
-    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    #[Route('/login', name: 'api_login', methods: ['POST'])]
     public function index(): Response
     {
         $user = $this->getUser();

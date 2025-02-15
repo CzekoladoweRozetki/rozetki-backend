@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Auth;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Auth\Domain\Repository\UserRepository;
 use App\Factory\UserFactory;
 use League\Bundle\OAuth2ServerBundle\Manager\ClientManagerInterface;
 use League\Bundle\OAuth2ServerBundle\Model\Client;
 use League\Bundle\OAuth2ServerBundle\ValueObject\RedirectUri;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Test\Factories;
 
 class OAuthLoginTest extends ApiTestCase
@@ -28,13 +30,24 @@ class OAuthLoginTest extends ApiTestCase
         $oauthClient = new Client('test', 'test', null);
         $oauthClient->setRedirectUris(new RedirectUri('https://example.com/callback'));
         $clientManager->save($oauthClient);
+        $passwordHasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
 
         $user = UserFactory::createOne([
             'email' => 'test@example.com',
             'password' => 'plainpassword123',
         ]);
+        $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
+        $userRepository->save($user);
 
-        $client->loginUser($user);
+        $response = $client->request('POST', '/login', [
+            'json' => [
+                'username' => $user->getEmail(),
+                'password' => 'plainpassword123',
+            ]
+        ]);
+
+        $this->assertResponseIsSuccessful();
 
         $codeVerifier = bin2hex(random_bytes(64));
         $codeChallengeMethod = 'S256';
@@ -86,9 +99,13 @@ class OAuthLoginTest extends ApiTestCase
 
         // Step 3: Use access token to access a protected resource
         $accessToken = $responseData['access_token'];
+
+        // stateless api endpoint should not have session cookie
+        $client->getCookieJar()->clear();
+
         $response = $client->request('GET', '/api/protected_tests', [
             'headers' => [
-                'Authorization' => 'Bearer '.$accessToken,
+                'Authorization' => 'Bearer ' . $accessToken,
             ],
         ]);
 
