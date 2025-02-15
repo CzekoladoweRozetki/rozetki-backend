@@ -21,6 +21,9 @@ security:
             security: true
             stateless: true
             oauth2: true
+            json_login:
+                check_path: api_login
+
             #        main:
             #            lazy: true
             #            provider: users_in_memory
@@ -36,6 +39,7 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/tests, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
         - { path: ^/api/users, roles: PUBLIC_ACCESS, methods: POST }
