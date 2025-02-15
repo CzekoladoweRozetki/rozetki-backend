@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Auth\Domain\Entity;
 
+use App\Auth\Domain\Exception\InvalidUserStatusException;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -17,6 +18,9 @@ use Symfony\Component\Uid\Uuid;
 #[Table(name: 'user_account')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    /**
+     * @param array<string> $roles
+     */
     public function __construct(
         #[Id]
         #[Column(type: UuidType::NAME)]
@@ -25,7 +29,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         private string $email,
         #[Column(type: 'string', length: 255)]
         private string $password,
+        #[Column(type: 'json')]
+        private array $roles = ['ROLE_USER'],
+        #[Column(type: 'string', length: 20)]
+        private string $status = UserStatus::INACTIVE->value,
     ) {
+        if (!UserStatus::tryFrom($status)) {
+            throw new InvalidUserStatusException('Invalid status');
+        }
     }
 
     public function getPassword(): string
@@ -48,9 +59,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->password = $hashPassword;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        return $this->roles;
     }
 
     public function eraseCredentials(): void
@@ -61,5 +75,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->email;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function activate(): void
+    {
+        $this->status = UserStatus::ACTIVE->value;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === UserStatus::ACTIVE->value;
     }
 }

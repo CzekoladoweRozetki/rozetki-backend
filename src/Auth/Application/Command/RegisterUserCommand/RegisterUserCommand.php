@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Auth\Application\RegisterUserCommand;
+namespace App\Auth\Application\Command\RegisterUserCommand;
 
 use App\Common\Application\Command\Command;
 use Symfony\Component\Uid\Uuid;

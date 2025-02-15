@@ -6,7 +6,7 @@ namespace App\Auth\Infrastructure\Api\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Auth\Application\RegisterUserCommand\RegisterUserCommand;
+use App\Auth\Application\Command\RegisterUserCommand\RegisterUserCommand;
 use App\Auth\Infrastructure\Api\DTO\UserInputDTO;
 use App\Auth\Infrastructure\Api\Resource\User;
 use App\Common\Application\Command\CommandBus;

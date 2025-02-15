@@ -2,21 +2,28 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Auth\Application;
+namespace App\Tests\Auth\Application\Command;
 
-use App\Auth\Application\RegisterUserCommand\RegisterUserCommand;
+use App\Auth\Application\Command\RegisterUserCommand\RegisterUserCommand;
+use App\Auth\Domain\Repository\ActivationTokenRepository;
 use App\Auth\Domain\Repository\UserRepository;
 use App\Common\Application\Command\CommandBus;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @covers \App\Auth\Application\Command\RegisterUserCommand\RegisterUserCommand
+ * @covers \App\Auth\Application\Command\RegisterUserCommand\RegisterUserCommandHandler
+ */
 class RegisterUserCommandTest extends KernelTestCase
 {
     private CommandBus $commandBus;
     private UserRepository $userRepository;
 
     private UserPasswordHasherInterface $passwordHasher;
+
+    private ActivationTokenRepository $activationTokenRepository;
 
     protected function setUp(): void
     {
@@ -25,6 +32,7 @@ class RegisterUserCommandTest extends KernelTestCase
         $this->commandBus = $container->get(CommandBus::class);
         $this->userRepository = $container->get(UserRepository::class);
         $this->passwordHasher = $container->get(UserPasswordHasherInterface::class);
+        $this->activationTokenRepository = $container->get(ActivationTokenRepository::class);
     }
 
     public function testRegisterUser(): void
@@ -45,5 +53,13 @@ class RegisterUserCommandTest extends KernelTestCase
             $this->passwordHasher->isPasswordValid($user, 'plainpassword'),
             'Password was not hashed correctly.'
         );
+
+        /**
+         * @var ActivationTokenRepository $activationTokenRepository
+         */
+        $activationTokenRepository = $this->activationTokenRepository;
+        $activationTokenCount = $activationTokenRepository->countUserTokens('test@example.com');
+
+        $this->assertEquals(1, $activationTokenCount, 'Activation token email does not match.');
     }
 }
