@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 class UserFactory extends PersistentObjectFactory
 {
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
         parent::__construct();
     }

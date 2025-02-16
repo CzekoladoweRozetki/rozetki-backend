@@ -24,7 +24,7 @@ class PasswordResetToken
         #[Column(type: 'datetime_immutable')]
         private \DateTimeImmutable $expiresAt,
         #[ManyToOne(targetEntity: User::class, fetch: 'EAGER')]
-        private User $user
+        private User $user,
     ) {
     }
 

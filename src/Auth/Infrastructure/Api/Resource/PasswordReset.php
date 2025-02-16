@@ -11,7 +11,7 @@ use App\Auth\Infrastructure\Api\Processor\PasswordResetProcessor;
 
 #[ApiResource(
     operations: [
-        new Post(processor: PasswordResetProcessor::class, status: 204),
+        new Post(status: 204, processor: PasswordResetProcessor::class),
     ]
 )]
 class PasswordReset
@@ -19,6 +19,7 @@ class PasswordReset
     public function __construct(
         #[ApiProperty(identifier: true)]
         public string $token,
+        public string $newPassword,
     ) {
     }
 }

@@ -9,6 +9,9 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Auth\Application\Command\RequestPasswordReset\RequestPasswordResetCommand;
 use App\Common\Application\Command\CommandBus;
 
+/**
+ * @implements ProcessorInterface<RequestPasswordResetCommand, null>
+ */
 class PasswordResetRequestProcessor implements ProcessorInterface
 {
     public function __construct(

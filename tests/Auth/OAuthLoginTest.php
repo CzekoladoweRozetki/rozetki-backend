@@ -42,7 +42,7 @@ class OAuthLoginTest extends ApiTestCase
             'json' => [
                 'username' => $user->getEmail(),
                 'password' => 'plainpassword123',
-            ]
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -103,7 +103,7 @@ class OAuthLoginTest extends ApiTestCase
 
         $response = $client->request('GET', '/api/protected_tests', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $accessToken,
+                'Authorization' => 'Bearer '.$accessToken,
             ],
         ]);
 

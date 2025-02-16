@@ -50,7 +50,7 @@ class UserRegisteredEventHandlerTest extends KernelTestCase
                         $message->getHtmlBody()
                     );
                     $this->assertStringContainsString(
-                        'localhost/activate-account/' . $event->token,
+                        'localhost/activate-account/'.$event->token,
                         $message->getHtmlBody()
                     );
 

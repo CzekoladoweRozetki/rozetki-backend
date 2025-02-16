@@ -21,5 +21,4 @@ class PasswordResetRequest
         public string $email,
     ) {
     }
-
 }

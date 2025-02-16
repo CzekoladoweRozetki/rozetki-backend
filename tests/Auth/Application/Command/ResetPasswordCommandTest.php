@@ -45,7 +45,7 @@ class ResetPasswordCommandTest extends WebTestCase
     {
         // Given
         $user = UserFactory::createOne([
-            'email' => 'user@example.com'
+            'email' => 'user@example.com',
         ]);
 
         $token = Uuid::v4();
@@ -84,7 +84,7 @@ class ResetPasswordCommandTest extends WebTestCase
     {
         // Given
         $user = UserFactory::createOne([
-            'email' => 'user@example.com'
+            'email' => 'user@example.com',
         ]);
 
         $token = Uuid::v4();

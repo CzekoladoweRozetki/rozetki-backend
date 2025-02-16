@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Auth\Domain\Repository;
 
-
 use App\Auth\Domain\Entity\PasswordResetToken;
 use App\Auth\Domain\Entity\User;
 

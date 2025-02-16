@@ -44,6 +44,7 @@ class PasswordResetRequestedEventHandlerTest extends KernelTestCase
                         'Reset your password by clicking the link below:',
                         $message->getHtmlBody()
                     );
+
                     return true;
                 }
                 )
