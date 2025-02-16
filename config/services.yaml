@@ -30,3 +30,9 @@ services:
             $fromName: '%admin_email_name%'
             $fromEmail: '%admin_email%'
             $accountActivationUrl: '%env(ACCOUNT_ACTIVATION_URL)%'
+    
+    App\Auth\Infrastructure\EventHandler\PasswordResetRequestedEventHandler:
+        arguments:
+            $fromName: '%admin_email_name%'
+            $fromEmail: '%admin_email%'
+            $passwordResetUrl: '%env(PASSWORD_RESET_URL)%'

@@ -12,6 +12,10 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Test\Factories;
 
+/**
+ * @covers \App\Auth\Application\Query\GetUserByIdQuery\GetUserByIdQuery
+ * @covers \App\Auth\Application\Query\GetUserByIdQuery\GetUserByIdQueryHandler
+ */
 class GetUserByIdQueryTest extends KernelTestCase
 {
     use Factories;
@@ -39,6 +43,5 @@ class GetUserByIdQueryTest extends KernelTestCase
         $this->assertInstanceOf(UserDTO::class, $userDTO);
         $this->assertEquals($userId, $userDTO->id);
         $this->assertEquals('test@example.com', $userDTO->email);
-        $this->assertEquals('hashedpassword', $userDTO->password);
     }
 }

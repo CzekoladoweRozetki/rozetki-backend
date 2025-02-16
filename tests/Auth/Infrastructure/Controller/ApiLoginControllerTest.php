@@ -7,6 +7,9 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+/**
+ * @covers \App\Auth\Infrastructure\Controller\ApiLoginController
+ */
 class ApiLoginControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
@@ -22,8 +25,6 @@ class ApiLoginControllerTest extends WebTestCase
             'email' => 'user@example.com',
             'password' => 'password',
         ]);
-
-        $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
     }
 
     public function testSuccessfulLogin(): void

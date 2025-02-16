@@ -37,8 +37,6 @@ class OAuthLoginTest extends ApiTestCase
             'email' => 'test@example.com',
             'password' => 'plainpassword123',
         ]);
-        $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-        $userRepository->save($user);
 
         $response = $client->request('POST', '/login', [
             'json' => [
