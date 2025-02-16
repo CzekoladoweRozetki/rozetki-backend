@@ -16,23 +16,17 @@ class UserRegisteredEventHandler
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private CommandBus $commandBus,
-        private string $fromName = 'Admin',
-        private string $fromEmail = 'test@example.com',
+        private string $fromName,
+        private string $fromEmail,
+        private string $accountActivationUrl
     ) {
     }
 
     public function __invoke(UserCreatedEvent $event): void
     {
-        // Send email to user
-        $path = $this->urlGenerator->generate(
-            '_api_/user_activations{._format}_post',
-            [
-                'token' => $event->token,
-            ],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        $path = $this->accountActivationUrl . $event->token;
 
-        $content = 'Welcome to our website. Please activate your account by clicking the link below: '.$path;
+        $content = 'Welcome to our website. Please activate your account by clicking the link below: ' . $path;
 
         $command = new SendMailCommand(
             email: $event->email,

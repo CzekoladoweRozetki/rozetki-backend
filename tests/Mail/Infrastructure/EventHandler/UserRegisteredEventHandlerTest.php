@@ -42,11 +42,15 @@ class UserRegisteredEventHandlerTest extends KernelTestCase
         $this->mailer->expects($this->once())
             ->method('send')
             ->with(
-                $this->callback(function ($message) use ($user) {
+                $this->callback(function ($message) use ($user, $event) {
                     $this->assertSame($user->getEmail(), $message->getTo()[0]->getAddress());
                     $this->assertSame('Welcome to our website', $message->getSubject());
                     $this->assertStringContainsString(
                         'Please activate your account by clicking the link below:',
+                        $message->getHtmlBody()
+                    );
+                    $this->assertStringContainsString(
+                        'localhost/activate-account/' . $event->token,
                         $message->getHtmlBody()
                     );
 
