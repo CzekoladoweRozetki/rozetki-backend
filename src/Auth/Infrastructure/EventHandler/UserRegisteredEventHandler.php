@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Mail\Infrastructure\EventHandler;
+namespace App\Auth\Infrastructure\EventHandler;
 
 use App\Auth\Domain\Event\UserCreatedEvent;
 use App\Common\Application\Command\CommandBus;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Mail\Infrastructure\EventHandler;
+namespace App\Tests\Auth\Infrastructure\EventHandler;
 
 use App\Auth\Domain\Event\UserCreatedEvent;
 use App\Common\Application\Event\EventBus;
@@ -13,7 +13,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Zenstruck\Foundry\Test\Factories;
 
 /**
- * @covers \App\Mail\Infrastructure\EventHandler\UserRegisteredEventHandler
+ * @covers \App\Auth\Infrastructure\EventHandler\UserRegisteredEventHandler
  */
 class UserRegisteredEventHandlerTest extends KernelTestCase
 {
