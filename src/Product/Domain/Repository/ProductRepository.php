@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Product\Domain\Repository;
 
+use App\Common\Domain\Repository\Repository;
 use App\Product\Domain\Entity\Product;
-use Symfony\Component\Uid\Uuid;
 
-interface ProductRepository
+/**
+ * @template-extends Repository<Product>
+ */
+interface ProductRepository extends Repository
 {
-    public function save(Product $product): void;
-
-    public function remove(Product $product): void;
-
-    public function findById(Uuid $id): ?Product;
 }

@@ -17,7 +17,7 @@ class GetProductByIdQueryHandler
 
     public function __invoke(GetProductByIdQuery $query): ?ProductDTO
     {
-        $product = $this->productRepository->findById($query->id);
+        $product = $this->productRepository->findOneById($query->id);
 
         return $product ? new ProductDTO(
             $product->getId(),

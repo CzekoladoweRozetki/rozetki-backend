@@ -39,7 +39,7 @@ class RemoveProductCommandTest extends KernelTestCase
         $this->commandBus->dispatch($command);
 
         // Then
-        $removedProduct = $this->productRepository->findById($productId);
+        $removedProduct = $this->productRepository->findOneById($productId);
         $this->assertNull($removedProduct);
     }
 }

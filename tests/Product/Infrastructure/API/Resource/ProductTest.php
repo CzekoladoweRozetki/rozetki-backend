@@ -44,8 +44,8 @@ class ProductTest extends ApiTestCase
         $responseData = $response->toArray();
         $productId = $responseData['id'];
 
-        $productRepository = self::getContainer()->get('App\Product\Domain\Repository\ProductRepository');
-        $product = $productRepository->findById(Uuid::fromString($productId));
+        $productRepository = self::getContainer()->get(ProductRepository::class);
+        $product = $productRepository->findOneById(Uuid::fromString($productId));
 
         $this->assertNotNull($product);
         $this->assertEquals('Test Product', $product->getName());
@@ -93,7 +93,7 @@ class ProductTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
 
         $productRepository = self::getContainer()->get(ProductRepository::class);
-        $deletedProduct = $productRepository->findById($product->getId());
+        $deletedProduct = $productRepository->findOneById($product->getId());
 
         $this->assertNull($deletedProduct);
     }

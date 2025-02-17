@@ -17,7 +17,7 @@ class RemoveProductCommandHandler
 
     public function __invoke(RemoveProductCommand $command): void
     {
-        $product = $this->productRepository->findById($command->id);
+        $product = $this->productRepository->findOneById($command->id);
 
         if ($product) {
             $this->productRepository->remove($product);
