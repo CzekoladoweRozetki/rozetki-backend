@@ -10,6 +10,7 @@ use App\Common\Application\Query\QueryBus;
 use App\Product\Application\Query\DTO\ProductDTO;
 use App\Product\Application\Query\GetProductById\GetProductByIdQuery;
 use App\Product\Infrastructure\Api\Resource\Product;
+use App\Product\Infrastructure\Api\Resource\ProductVariant;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -37,10 +38,21 @@ class ProductSingleProvider implements ProviderInterface
             return null;
         }
 
+        $variants = array_map(
+            fn ($variant) => new ProductVariant(
+                $variant->id->toString(),
+                $variant->name,
+                $variant->description,
+                $variant->slug
+            ),
+            $product->variants
+        );
+
         return new Product(
             $product->id->toString(),
             $product->name,
-            $product->description
+            $product->description,
+            $variants
         );
     }
 }

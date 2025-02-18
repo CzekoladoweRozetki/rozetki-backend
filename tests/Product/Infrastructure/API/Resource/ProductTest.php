@@ -6,6 +6,7 @@ namespace App\Tests\Product\Infrastructure\API\Resource;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Factory\ProductFactory;
+use App\Factory\ProductVariantFactory;
 use App\Factory\UserFactory;
 use App\Product\Domain\Entity\Product;
 use App\Product\Domain\Repository\ProductRepository;
@@ -13,6 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Test\Factories;
 
+/**
+ * @covers \App\Product\Infrastructure\Api\Resource\Product
+ */
 class ProductTest extends ApiTestCase
 {
     use Factories;
@@ -127,6 +131,54 @@ class ProductTest extends ApiTestCase
             'name' => $product->getName(),
             'description' => $product->getDescription(),
         ]);
+    }
+
+    public function testGetProductWithVariants(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne();
+        $client->loginUser($user);
+
+        /** @var Product $product */
+        $product = ProductFactory::createOne([
+            'name' => 'Test Product',
+            'description' => 'Test Description',
+        ]);
+
+        $variants = ProductVariantFactory::createMany(2, [
+            'product' => $product,
+        ]);
+
+        // When
+        $response = $client->request('GET', '/api/products/'.$product->getId()->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertJsonContains([
+            'id' => $product->getId()->toRfc4122(),
+            'name' => 'Test Product',
+            'description' => 'Test Description',
+            'variants' => [
+                [
+                    'id' => $variants[0]->getId()->toRfc4122(),
+                    'name' => $variants[0]->getName(),
+                    'description' => $variants[0]->getDescription(),
+                ],
+                [
+                    'id' => $variants[1]->getId()->toRfc4122(),
+                    'name' => $variants[1]->getName(),
+                    'description' => $variants[1]->getDescription(),
+                ],
+            ],
+        ]);
+
+        $responseData = $response->toArray();
+        $this->assertCount(2, $responseData['variants']);
+        $this->assertArrayHasKey('slug', $responseData['variants'][0]);
+        $this->assertArrayHasKey('slug', $responseData['variants'][1]);
+        $this->assertNotEmpty($responseData['variants'][0]['id']);
+        $this->assertNotEmpty($responseData['variants'][1]['id']);
     }
 
     public function testDeleteProduct(): void
