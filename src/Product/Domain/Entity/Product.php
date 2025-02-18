@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Product\Domain\Entity;
 
 use App\Common\Domain\Entity\BaseEntity;
+use App\Product\Application\Command\CreateProduct\ProductVariantDTO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -53,5 +54,23 @@ class Product extends BaseEntity
     public function getVariants(): Collection
     {
         return $this->variants;
+    }
+
+    /**
+     * @param array<int, ProductVariantDTO> $variants
+     */
+    public function addVariants(array $variants): void
+    {
+        foreach ($variants as $variant) {
+            $this->variants->add(
+                new ProductVariant(
+                    Uuid::v4(),
+                    $variant->name,
+                    $variant->slug,
+                    $variant->description,
+                    $this
+                )
+            );
+        }
     }
 }

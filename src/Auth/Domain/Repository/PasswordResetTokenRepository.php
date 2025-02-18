@@ -13,9 +13,7 @@ use App\Common\Domain\Repository\Repository;
  */
 interface PasswordResetTokenRepository extends Repository
 {
-
     public function findOneByToken(string $token): ?PasswordResetToken;
 
     public function findOneByUser(User $user): ?PasswordResetToken;
-
 }

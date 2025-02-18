@@ -9,6 +9,10 @@ readonly class ProductInputDTO
     public function __construct(
         public string $name,
         public string $description,
+        /**
+         * @var ProductVariantInputDTO[]
+         */
+        public array $variants = [],
     ) {
     }
 }

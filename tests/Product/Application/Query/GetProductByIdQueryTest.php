@@ -6,8 +6,8 @@ namespace App\Tests\Product\Application\Query;
 
 use App\Common\Application\Query\QueryBus;
 use App\Factory\ProductFactory;
+use App\Product\Application\Query\DTO\ProductDTO;
 use App\Product\Application\Query\GetProductById\GetProductByIdQuery;
-use App\Product\Application\Query\GetProductById\ProductDTO;
 use App\Product\Domain\Entity\Product;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;

@@ -52,6 +52,60 @@ class ProductTest extends ApiTestCase
         $this->assertEquals('This is a test product description.', $product->getDescription());
     }
 
+    public function testCreateProductWithVariants(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne();
+        $client->loginUser($user);
+
+        $requestData = [
+            'name' => 'Test Product',
+            'description' => 'This is a test product description.',
+            'variants' => [
+                [
+                    'name' => 'Variant 1',
+                    'description' => 'First variant description',
+                ],
+                [
+                    'name' => 'Variant 2',
+                    'description' => 'Second variant description',
+                ],
+            ],
+        ];
+
+        // When
+        $response = $client->request('POST', '/api/products', [
+            'json' => $requestData,
+        ]);
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJsonContains([
+            'name' => 'Test Product',
+            'description' => 'This is a test product description.',
+        ]);
+
+        $responseData = $response->toArray();
+        $productId = $responseData['id'];
+
+        $productRepository = self::getContainer()->get(ProductRepository::class);
+        $product = $productRepository->findOneById(Uuid::fromString($productId));
+
+        $this->assertNotNull($product);
+        $this->assertEquals('Test Product', $product->getName());
+        $this->assertEquals('This is a test product description.', $product->getDescription());
+
+        $variants = $product->getVariants();
+        $this->assertCount(2, $variants);
+
+        $variantsArray = $variants->toArray();
+        $this->assertEquals('Variant 1', $variantsArray[0]->getName());
+        $this->assertEquals('First variant description', $variantsArray[0]->getDescription());
+        $this->assertEquals('Variant 2', $variantsArray[1]->getName());
+        $this->assertEquals('Second variant description', $variantsArray[1]->getDescription());
+    }
+
     public function testGetSingleProduct(): void
     {
         $client = static::createClient();

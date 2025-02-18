@@ -13,6 +13,10 @@ readonly class CreateProductCommand extends Command
         public Uuid $id,
         public string $name,
         public string $description,
+        /**
+         * @var ProductVariantDTO[]
+         */
+        public array $variants = [],
     ) {
     }
 }

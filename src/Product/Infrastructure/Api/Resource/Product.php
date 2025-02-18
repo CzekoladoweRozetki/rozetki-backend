@@ -23,11 +23,15 @@ use App\Product\Infrastructure\Api\Provider\ProductSingleProvider;
 )]
 readonly class Product
 {
+    /**
+     * @param array<ProductVariant> $variants
+     */
     public function __construct(
         #[ApiProperty(identifier: true)]
         public string $id,
         public string $name,
         public string $description,
+        public array $variants = [],
     ) {
     }
 }

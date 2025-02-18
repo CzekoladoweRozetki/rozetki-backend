@@ -26,7 +26,6 @@ class DoctrinePasswordResetRepository extends ServiceEntityRepository implements
         parent::__construct($registry, PasswordResetToken::class);
     }
 
-
     public function findOneByToken(string $token): ?PasswordResetToken
     {
         return $this->findOneBy(['id' => $token]);

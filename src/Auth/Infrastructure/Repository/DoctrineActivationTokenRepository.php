@@ -25,7 +25,6 @@ class DoctrineActivationTokenRepository extends ServiceEntityRepository implemen
         parent::__construct($registry, ActivationToken::class);
     }
 
-
     public function findByToken(string $token): ?ActivationToken
     {
         return $this->findOneBy(['token' => $token]);
@@ -38,6 +37,6 @@ class DoctrineActivationTokenRepository extends ServiceEntityRepository implemen
         $qb->where('a.email = :email');
         $qb->setParameter('email', $getEmail);
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

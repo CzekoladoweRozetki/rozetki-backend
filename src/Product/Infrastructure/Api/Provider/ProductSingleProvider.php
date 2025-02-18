@@ -7,8 +7,8 @@ namespace App\Product\Infrastructure\Api\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Common\Application\Query\QueryBus;
+use App\Product\Application\Query\DTO\ProductDTO;
 use App\Product\Application\Query\GetProductById\GetProductByIdQuery;
-use App\Product\Application\Query\GetProductById\ProductDTO;
 use App\Product\Infrastructure\Api\Resource\Product;
 use Symfony\Component\Uid\Uuid;
 
