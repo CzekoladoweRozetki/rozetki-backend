@@ -6,6 +6,7 @@ namespace App\Auth\Infrastructure\Repository;
 
 use App\Auth\Domain\Entity\User;
 use App\Auth\Domain\Repository\UserRepository;
+use App\Common\Infrastructure\Repository\DoctrineRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
@@ -15,6 +16,11 @@ use Symfony\Component\Uid\Uuid;
  */
 class DoctrineUserRepository extends ServiceEntityRepository implements UserRepository
 {
+    /**
+     * @use DoctrineRepositoryTrait<User>
+     */
+    use DoctrineRepositoryTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
@@ -23,18 +29,6 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
     public function findOneByEmail(string $email): ?User
     {
         return $this->findOneBy(['email' => $email]);
-    }
-
-    public function save(User $user): void
-    {
-        $this->getEntityManager()->persist($user);
-        $this->getEntityManager()->flush();
-    }
-
-    public function remove(User $user): void
-    {
-        $this->getEntityManager()->remove($user);
-        $this->getEntityManager()->flush();
     }
 
     public function getUserById(Uuid $id): ?User

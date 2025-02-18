@@ -47,7 +47,7 @@ class PasswordResetTest extends ApiTestCase
 
         $client->request('POST', '/api/password_resets', [
             'json' => [
-                'token' => $token->getToken(),
+                'token' => $token->getId(),
                 'newPassword' => $newPassword,
             ],
         ]);

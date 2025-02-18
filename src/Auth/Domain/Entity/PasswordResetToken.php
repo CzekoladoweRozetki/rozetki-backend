@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Auth\Domain\Entity;
 
+use App\Common\Domain\Entity\BaseEntity;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -13,24 +14,25 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[Entity]
-class PasswordResetToken
+class PasswordResetToken extends BaseEntity
 {
     use TimestampableEntity;
 
     public function __construct(
         #[Id]
         #[Column(type: UuidType::NAME)]
-        private Uuid $token,
+        protected Uuid $id,
         #[Column(type: 'datetime_immutable')]
         private \DateTimeImmutable $expiresAt,
         #[ManyToOne(targetEntity: User::class, fetch: 'EAGER')]
         private User $user,
     ) {
+        parent::__construct($id);
     }
 
-    public function getToken(): Uuid
+    public function getId(): Uuid
     {
-        return $this->token;
+        return $this->id;
     }
 
     public function getUser(): User

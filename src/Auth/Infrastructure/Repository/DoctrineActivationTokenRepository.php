@@ -6,6 +6,7 @@ namespace App\Auth\Infrastructure\Repository;
 
 use App\Auth\Domain\Entity\ActivationToken;
 use App\Auth\Domain\Repository\ActivationTokenRepository;
+use App\Common\Infrastructure\Repository\DoctrineRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,26 +15,20 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class DoctrineActivationTokenRepository extends ServiceEntityRepository implements ActivationTokenRepository
 {
+    /**
+     * @use DoctrineRepositoryTrait<ActivationToken>
+     */
+    use DoctrineRepositoryTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ActivationToken::class);
     }
 
-    public function save(ActivationToken $activationToken): void
-    {
-        $this->getEntityManager()->persist($activationToken);
-        $this->getEntityManager()->flush();
-    }
 
     public function findByToken(string $token): ?ActivationToken
     {
         return $this->findOneBy(['token' => $token]);
-    }
-
-    public function delete(ActivationToken $activationToken): void
-    {
-        $this->getEntityManager()->remove($activationToken);
-        $this->getEntityManager()->flush();
     }
 
     public function countUserTokens(string $getEmail): int
@@ -43,6 +38,6 @@ class DoctrineActivationTokenRepository extends ServiceEntityRepository implemen
         $qb->where('a.email = :email');
         $qb->setParameter('email', $getEmail);
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 }

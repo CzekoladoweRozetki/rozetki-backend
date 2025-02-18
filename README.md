@@ -24,6 +24,12 @@ Base module structure:
     - EventListener
     - API
 
+## Domain
+
+Entity should extend BaseEntity class.
+Repository should extend Repository class.
+Doctrine repository can use DoctrineRepositoryTrait for implementation of Repository interface.
+
 ## API
 
 API documentation is available at /api/docs

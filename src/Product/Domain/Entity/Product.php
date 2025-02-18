@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Product\Domain\Entity;
 
+use App\Common\Domain\Entity\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -14,7 +15,7 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[Entity]
-class Product
+class Product extends BaseEntity
 {
     /**
      * @param Collection<int, ProductVariant> $variants
@@ -22,7 +23,7 @@ class Product
     public function __construct(
         #[Id]
         #[Column(type: UuidType::NAME)]
-        private Uuid $id,
+        protected Uuid $id,
         #[Column(type: 'string', length: 255, nullable: false)]
         private string $name,
         #[Column(type: 'text', nullable: false)]
@@ -33,11 +34,7 @@ class Product
         ], fetch: 'EAGER', orphanRemoval: true)]
         private Collection $variants = new ArrayCollection(),
     ) {
-    }
-
-    public function getId(): Uuid
-    {
-        return $this->id;
+        parent::__construct($id);
     }
 
     public function getName(): string

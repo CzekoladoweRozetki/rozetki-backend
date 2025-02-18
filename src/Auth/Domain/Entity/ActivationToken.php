@@ -2,6 +2,7 @@
 
 namespace App\Auth\Domain\Entity;
 
+use App\Common\Domain\Entity\BaseEntity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -9,14 +10,14 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[Entity]
-class ActivationToken
+class ActivationToken extends BaseEntity
 {
     use TimestampableEntity;
 
     public function __construct(
         #[ORM\Id]
         #[ORM\Column(type: UuidType::NAME)]
-        private Uuid $id,
+        protected Uuid $id,
         #[ORM\Column(type: 'string', length: 180, unique: true)]
         private string $token,
         #[ORM\Column(type: 'string', length: 180, unique: true)]
@@ -24,9 +25,10 @@ class ActivationToken
         #[ORM\Column(type: 'datetime')]
         private \DateTimeInterface $expiresAt,
     ) {
+        parent::__construct($id);
     }
 
-    public function getId(): ?Uuid
+    public function getId(): Uuid
     {
         return $this->id;
     }

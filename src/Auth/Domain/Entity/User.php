@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Auth\Domain\Entity;
 
 use App\Auth\Domain\Exception\InvalidUserStatusException;
+use App\Common\Domain\Entity\BaseEntity;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -16,7 +17,7 @@ use Symfony\Component\Uid\Uuid;
 
 #[Entity]
 #[Table(name: 'user_account')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @param array<string> $roles
@@ -24,7 +25,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct(
         #[Id]
         #[Column(type: UuidType::NAME)]
-        private Uuid $id,
+        protected Uuid $id,
         #[Column(type: 'string', length: 180, unique: true)]
         private string $email,
         #[Column(type: 'string', length: 255)]
@@ -34,6 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         #[Column(type: 'string', length: 20)]
         private string $status = UserStatus::INACTIVE->value,
     ) {
+        parent::__construct($id);
         if (!UserStatus::tryFrom($status)) {
             throw new InvalidUserStatusException('Invalid status');
         }

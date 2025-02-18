@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Product\Domain\Entity;
 
+use App\Common\Domain\Entity\BaseEntity;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -12,12 +13,12 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[Entity]
-class ProductVariant
+class ProductVariant extends BaseEntity
 {
     public function __construct(
         #[Id]
         #[Column(type: UuidType::NAME)]
-        private Uuid $id,
+        protected Uuid $id,
         #[Column(type: 'string')]
         private string $name,
         #[Column(type: 'string', length: 255, unique: true)]
@@ -27,6 +28,7 @@ class ProductVariant
         #[ManyToOne(targetEntity: Product::class, fetch: 'EAGER', inversedBy: 'variants')]
         private Product $product,
     ) {
+        parent::__construct($id);
         // validate that slug is composed of only alphanumeric characters and dashes
         if (!preg_match('/^[a-z0-9-]+$/', $slug)) {
             throw new \InvalidArgumentException('Invalid slug');
