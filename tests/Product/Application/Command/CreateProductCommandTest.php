@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Product\Application\Command;
 
+use App\Common\Application\Event\EventBus;
 use App\Product\Application\Command\CreateProduct\CreateProductCommand;
 use App\Product\Application\Command\CreateProduct\ProductVariantDTO;
+use App\Product\Domain\Event\ProductCreatedEvent;
 use App\Product\Domain\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -54,6 +56,26 @@ class CreateProductCommandTest extends KernelTestCase
                 new ProductVariantDTO('Variant 2', 'Second variant description'),
             ]
         );
+
+        // Mock the EventBus
+        $eventBus = $this->createMock(EventBus::class);
+        $eventBus->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->callback(function (ProductCreatedEvent $event) use ($productId) {
+                    return $event->getProductId() === $productId->toString()
+                        && 'Test Product' === $event->getName()
+                        && 'This is a test product description.' === $event->getDescription()
+                        && 2 === count($event->getVariants())
+                        && 'Variant 1' === $event->getVariants()[0]->name
+                        && 'First variant description' === $event->getVariants()[0]->description
+                        && 'Variant 2' === $event->getVariants()[1]->name
+                        && 'Second variant description' === $event->getVariants()[1]->description;
+                })
+            );
+
+        // Replace the EventBus in the container with the mock
+        self::getContainer()->set(EventBus::class, $eventBus);
 
         // When
         $this->commandBus->dispatch($command);

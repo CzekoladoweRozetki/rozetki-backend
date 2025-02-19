@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Product\Application\Command\CreateProduct;
 
+use App\Common\Application\Event\EventBus;
 use App\Product\Domain\Entity\Product;
+use App\Product\Domain\Event\Partial\ProductVariant;
+use App\Product\Domain\Event\ProductCreatedEvent;
 use App\Product\Domain\Repository\ProductRepository;
 use App\Product\Domain\Repository\ProductVariantRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -17,6 +20,7 @@ class CreateProductCommandHandler
         private ProductRepository $productRepository,
         private ProductVariantRepository $productVariantRepository,
         private SluggerInterface $slugger,
+        private EventBus $eventBus,
     ) {
     }
 
@@ -42,5 +46,14 @@ class CreateProductCommandHandler
         $product->addVariants($command->variants);
 
         $this->productRepository->save($product);
+
+        $event = new ProductCreatedEvent(
+            $product->getId()->toString(),
+            $product->getName(),
+            $product->getDescription(),
+            array_map(fn ($variant) => ProductVariant::fromVariant($variant), $product->getVariants()->toArray())
+        );
+
+        $this->eventBus->dispatch($event);
     }
 }

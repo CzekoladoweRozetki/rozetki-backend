@@ -49,6 +49,7 @@ security:
         - { path: ^/api/tests, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
         - { path: ^/api/users, roles: PUBLIC_ACCESS, methods: POST }
+        - { path: ^/api/catalog_products, roles: PUBLIC_ACCESS, methods: GET }
         - { path: ^/api/user_activation, roles: PUBLIC_ACCESS, methods: POST }
         - { path: ^/api/password_resets, roles: PUBLIC_ACCESS, methods: POST }
         - { path: ^/api/password_reset_requests, roles: PUBLIC_ACCESS, methods: POST }
