@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
+    operations: [],
     normalizationContext: ['groups' => ['productVariant']]
 )]
 class ProductVariant
