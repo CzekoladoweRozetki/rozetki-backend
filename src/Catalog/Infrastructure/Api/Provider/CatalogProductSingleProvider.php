@@ -27,7 +27,6 @@ class CatalogProductSingleProvider implements ProviderInterface
 
         return $product ? new CatalogProduct(
             $product['slug'],
-            $product['id'],
             $product['name'],
             $product['description'],
         ) : null;

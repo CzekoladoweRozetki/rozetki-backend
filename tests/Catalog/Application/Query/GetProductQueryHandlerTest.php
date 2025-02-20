@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Catalog\Application;
+namespace App\Tests\Catalog\Application\Query;
 
 use App\Catalog\Application\Query\GetProduct\GetProductQuery;
 use App\Common\Application\Query\QueryBus;
@@ -11,6 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Test\Factories;
 
+/**
+ * @covers \App\Catalog\Application\Query\GetProduct\GetProductQueryHandler
+ * @covers \App\Catalog\Application\Query\GetProduct\GetProductQuery
+ */
 class GetProductQueryHandlerTest extends KernelTestCase
 {
     use Factories;
