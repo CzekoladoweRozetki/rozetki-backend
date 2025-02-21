@@ -119,4 +119,120 @@ class GetProductsQueryHandlerTest extends KernelTestCase
         self::assertCount(1, $result);
         self::assertEquals('Product 3', $result[0]->name);
     }
+
+    public function testShouldFindProductsWithPartialWordMatch(): void
+    {
+        // Given
+        CatalogProductFactory::createSequence([
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Electric Bicycle',
+                'description' => 'Modern electric bicycle',
+                'slug' => 'electric-bicycle',
+            ],
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Mountain Bike',
+                'description' => 'Professional bike for mountains',
+                'slug' => 'mountain-bike',
+            ],
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Car',
+                'description' => 'Vehicle',
+                'slug' => 'car',
+            ],
+        ]);
+
+        $query = new GetProductsQuery(
+            search: 'bik',
+            page: 1,
+            limit: 10
+        );
+
+        // When
+        $result = $this->queryBus->query($query);
+
+        // Then
+        self::assertCount(2, $result);
+        self::assertEquals('Electric Bicycle', $result[0]->name);
+        self::assertEquals('Mountain Bike', $result[1]->name);
+    }
+
+    public function testShouldFindProductsWithFuzzyMatching(): void
+    {
+        // Given
+        CatalogProductFactory::createSequence([
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Electric Bicycle',
+                'description' => 'Modern electric bicycle',
+                'slug' => 'electric-bicycle',
+            ],
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Electronic Bike',
+                'description' => 'Professional bike',
+                'slug' => 'electronic-bike',
+            ],
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Car',
+                'description' => 'Vehicle',
+                'slug' => 'car',
+            ],
+        ]);
+
+        $query = new GetProductsQuery(
+            search: 'elektric',  // Misspelled word
+            page: 1,
+            limit: 10
+        );
+
+        // When
+        $result = $this->queryBus->query($query);
+
+        // Then
+        self::assertCount(2, $result);
+        self::assertEquals('Electric Bicycle', $result[0]->name);
+        self::assertEquals('Electronic Bike', $result[1]->name);
+    }
+
+    public function testShouldFindProductsInDescription(): void
+    {
+        // Given
+        CatalogProductFactory::createSequence([
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Bike A',
+                'description' => 'Professional mountain bicycle',
+                'slug' => 'bike-a',
+            ],
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Bike B',
+                'description' => 'Regular city bike',
+                'slug' => 'bike-b',
+            ],
+            [
+                'id' => Uuid::v4(),
+                'name' => 'Car',
+                'description' => 'Vehicle',
+                'slug' => 'car',
+            ],
+        ]);
+
+        $query = new GetProductsQuery(
+            search: 'mountain',
+            page: 1,
+            limit: 10
+        );
+
+        // When
+        $result = $this->queryBus->query($query);
+
+        // Then
+        self::assertCount(1, $result);
+        self::assertEquals('Bike A', $result[0]->name);
+    }
 }

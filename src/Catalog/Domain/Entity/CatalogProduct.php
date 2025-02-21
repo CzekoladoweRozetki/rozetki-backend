@@ -8,10 +8,13 @@ use App\Common\Domain\Entity\BaseEntity;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\Index;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[Entity]
+#[Index(columns: ['search_vector'], flags: ['gin'])]
+#[Index(columns: ['slug'])]
 class CatalogProduct extends BaseEntity
 {
     public function __construct(
@@ -26,6 +29,8 @@ class CatalogProduct extends BaseEntity
         private string $slug,
         #[Column(type: 'json_document', nullable: true, options: ['jsonb' => true])]
         private mixed $data = null,
+        #[Column(type: 'tsvector', nullable: true)]
+        private ?string $searchVector = null,
     ) {
         parent::__construct($this->id);
     }
@@ -48,5 +53,10 @@ class CatalogProduct extends BaseEntity
     public function getData(): mixed
     {
         return $this->data;
+    }
+
+    public function getSearchVector(): ?string
+    {
+        return $this->searchVector;
     }
 }
