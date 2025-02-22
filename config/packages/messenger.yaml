@@ -7,6 +7,7 @@ framework:
                 middleware:
                     - validation
                     - doctrine_transaction
+                    - App\Auth\Infrastructure\Symfony\Messenger\Middleware\AuthorizationMiddleware
             query.bus:
                 middleware:
                     - validation

@@ -2,6 +2,20 @@
 
 namespace App\Common\Application\Query;
 
-abstract readonly class Query
+use App\Common\Infrastructure\Security\AuthorizableMessage;
+use App\Common\Infrastructure\Security\ExecutionContext;
+
+abstract readonly class Query implements AuthorizableMessage
 {
+    private ExecutionContext $executionContext;
+
+    public function __construct(ExecutionContext $executionContext = ExecutionContext::Web)
+    {
+        $this->executionContext = $executionContext;
+    }
+
+    public function getExecutionContext(): ExecutionContext
+    {
+        return $this->executionContext ?? ExecutionContext::Web;
+    }
 }

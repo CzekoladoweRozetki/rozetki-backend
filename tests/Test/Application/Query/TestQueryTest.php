@@ -8,7 +8,6 @@ use App\Common\Application\Query\QueryBus;
 use App\Test\Application\Query\TestQuery;
 use App\Test\Domain\Entity\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Uuid;
 
 class TestQueryTest extends KernelTestCase
@@ -18,8 +17,7 @@ class TestQueryTest extends KernelTestCase
         self::bootKernel(['environment' => 'test']);
         $container = self::getContainer();
 
-        $messageBus = $container->get(MessageBusInterface::class);
-        $queryBus = new QueryBus($messageBus);
+        $queryBus = $container->get(QueryBus::class);
         $em = $container->get('doctrine.orm.entity_manager');
 
         $id = Uuid::v4();

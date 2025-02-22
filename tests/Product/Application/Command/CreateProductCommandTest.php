@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Product\Application\Command;
 
 use App\Common\Application\Event\EventBus;
+use App\Common\Infrastructure\Security\ExecutionContext;
 use App\Product\Application\Command\CreateProduct\CreateProductCommand;
 use App\Product\Application\Command\CreateProduct\ProductVariantDTO;
 use App\Product\Domain\Event\ProductCreatedEvent;
@@ -28,7 +29,8 @@ class CreateProductCommandTest extends KernelTestCase
         $command = new CreateProductCommand(
             Uuid::v4(),
             'Test Product',
-            'This is a test product description.'
+            'This is a test product description.',
+            executionContext: ExecutionContext::Internal
         );
 
         $this->commandBus->dispatch($command);
@@ -54,7 +56,8 @@ class CreateProductCommandTest extends KernelTestCase
             [
                 new ProductVariantDTO('Variant 1', 'First variant description'),
                 new ProductVariantDTO('Variant 2', 'Second variant description'),
-            ]
+            ],
+            executionContext: ExecutionContext::Internal
         );
 
         // Mock the EventBus

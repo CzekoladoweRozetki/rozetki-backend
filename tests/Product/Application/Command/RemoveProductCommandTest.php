@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Product\Application\Command;
 
+use App\Common\Infrastructure\Security\ExecutionContext;
 use App\Factory\ProductFactory;
 use App\Product\Application\Command\RemoveProduct\RemoveProductCommand;
 use App\Product\Domain\Repository\ProductRepository;
@@ -35,7 +36,7 @@ class RemoveProductCommandTest extends KernelTestCase
         ]);
 
         // When
-        $command = new RemoveProductCommand($productId);
+        $command = new RemoveProductCommand($productId, executionContext: ExecutionContext::Internal);
         $this->commandBus->dispatch($command);
 
         // Then

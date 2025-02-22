@@ -3,6 +3,7 @@
 namespace App\Mail\Application\SendMail;
 
 use App\Common\Application\Command\Command;
+use App\Common\Infrastructure\Security\ExecutionContext;
 use Symfony\Component\Validator\Constraints as Assert;
 
 readonly class SendMailCommand extends Command
@@ -16,5 +17,6 @@ readonly class SendMailCommand extends Command
         public string $fromMail,
         public string $fromName,
     ) {
+        parent::__construct(ExecutionContext::Internal);
     }
 }

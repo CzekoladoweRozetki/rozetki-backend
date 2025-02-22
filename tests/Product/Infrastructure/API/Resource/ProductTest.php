@@ -25,7 +25,7 @@ class ProductTest extends ApiTestCase
     {
         $client = static::createClient();
 
-        $user = UserFactory::createOne();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
 
         $client->loginUser($user);
 
@@ -60,7 +60,7 @@ class ProductTest extends ApiTestCase
     {
         // Given
         $client = static::createClient();
-        $user = UserFactory::createOne();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $client->loginUser($user);
 
         $requestData = [
@@ -185,7 +185,7 @@ class ProductTest extends ApiTestCase
     {
         $client = static::createClient();
 
-        $user = UserFactory::createOne();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $client->loginUser($user);
 
         // Given: Create a product to delete
