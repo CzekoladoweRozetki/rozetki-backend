@@ -11,6 +11,7 @@ framework:
             query.bus:
                 middleware:
                     - validation
+                    - App\Auth\Infrastructure\Symfony\Messenger\Middleware\AuthorizationMiddleware
             event.bus:
                 default_middleware:
                     enabled: true
