@@ -44,6 +44,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Catalog/Domain/Entity'
                 prefix: 'App\Catalog\Domain\Entity'
                 alias: Catalog
+            Category:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Category/Domain/Entity'
+                prefix: 'App\Category\Domain\Entity'
+                alias: Category
         controller_resolver:
             auto_mapping: false
 
