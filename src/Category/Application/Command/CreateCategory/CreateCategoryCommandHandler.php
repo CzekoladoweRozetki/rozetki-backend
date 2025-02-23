@@ -39,11 +39,9 @@ class CreateCategoryCommandHandler
             }
         }
 
-        $slug = $this->slugger->slug($command->slug)->lower();
-        $existingCategoryWithSlug = $this->categoryRepository->findBySlug($slug->toString());
-        if ($existingCategoryWithSlug) {
-            $slug = $this->slugger->slug($command->name)->lower();
-        }
+        $slug = $command->slug
+            ? $this->slugger->slug($command->slug)->lower()
+            : $this->slugger->slug($command->name)->lower();
         $existingCategoryWithSlug = $this->categoryRepository->findBySlug($slug->toString());
         if ($existingCategoryWithSlug) {
             $slug = $this->slugger->slug($command->name.'-'.bin2hex(random_bytes(4)))->lower();

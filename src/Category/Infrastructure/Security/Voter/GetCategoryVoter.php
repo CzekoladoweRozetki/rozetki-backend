@@ -6,23 +6,23 @@ namespace App\Category\Infrastructure\Security\Voter;
 
 use App\Auth\Domain\Entity\User;
 use App\Auth\Domain\UserRole;
-use App\Category\Application\Command\CreateCategory\CreateCategoryCommand;
+use App\Category\Application\Query\GetCategory\GetCategoryQuery;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @extends Voter<string, CreateCategoryCommand>
+ * @extends Voter<string, GetCategoryQuery>
  */
-class CreateCategoryVoter extends Voter
+class GetCategoryVoter extends Voter
 {
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if (CreateCategoryCommand::class !== $attribute) {
+        if (GetCategoryQuery::class !== $attribute) {
             return false;
         }
 
-        if ($subject instanceof CreateCategoryCommand) {
+        if ($subject instanceof GetCategoryQuery) {
             return true;
         }
 
@@ -31,7 +31,7 @@ class CreateCategoryVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        /** @var (User&UserInterface)|null $user */
+        /** @var (UserInterface&User)|null $user */
         $user = $token->getUser();
 
         if (!$user instanceof User) {

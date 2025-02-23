@@ -17,4 +17,7 @@ api_platform:
             mime_types: [ 'application/json' ]
         jsonld:
             mime_types: [ 'application/ld+json' ]
+    
+    exception_to_status:
+        DomainException: 400
 
