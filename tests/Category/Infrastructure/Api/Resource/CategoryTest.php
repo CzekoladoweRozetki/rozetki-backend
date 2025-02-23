@@ -133,4 +133,101 @@ class CategoryTest extends ApiTestCase
             'detail' => 'Category not found',
         ]);
     }
+
+    public function testShouldGetCategory(): void
+    {
+        // Given
+        $category = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        // When
+        $response = $this->client->request('GET', self::API_URL.'/'.$category->getId());
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        self::assertJsonContains([
+            'id' => $category->getId()->__toString(),
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+    }
+
+    public function testShouldReturn404WhenCategoryNotFound(): void
+    {
+        // Given
+        $nonExistentId = Uuid::v4();
+
+        // When
+        $this->client->request('GET', self::API_URL.'/'.$nonExistentId);
+
+        // Then
+        self::assertResponseStatusCodeSame(404);
+        self::assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+    }
+
+    public function testShouldGetCategoryCollection(): void
+    {
+        // Given
+        $electronics = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        CategoryFactory::createOne([
+            'name' => 'Laptops',
+            'slug' => 'laptops',
+            'parent' => $electronics,
+        ]);
+
+        CategoryFactory::createOne([
+            'name' => 'Books',
+            'slug' => 'books',
+        ]);
+
+        // When
+        $response = $this->client->request('GET', self::API_URL);
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        self::assertCount(3, $content['member']);
+        self::assertJsonContains([
+            'totalItems' => 3,
+            'member' => [
+                [
+                    'name' => 'Electronics',
+                    'slug' => 'electronics',
+                ],
+                [
+                    'name' => 'Laptops',
+                    'slug' => 'laptops',
+                    'parent' => $electronics->getId()->__toString(),
+                ],
+                [
+                    'name' => 'Books',
+                    'slug' => 'books',
+                ],
+            ],
+        ]);
+    }
+
+    public function testShouldGetEmptyCategoryCollection(): void
+    {
+        // When
+        $response = $this->client->request('GET', self::API_URL);
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        self::assertCount(0, $content['member']);
+        self::assertJsonContains([
+            'totalItems' => 0,
+            'member' => [],
+        ]);
+    }
 }

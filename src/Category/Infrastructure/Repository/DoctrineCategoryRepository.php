@@ -34,4 +34,14 @@ class DoctrineCategoryRepository extends ServiceEntityRepository implements Cate
     {
         return $this->findOneBy(['slug' => $slug]);
     }
+
+    public function findRootCategories(): array
+    {
+        return $this->findBy(['parent' => null]);
+    }
+
+    public function findAllCategories(): array
+    {
+        return $this->findAll();
+    }
 }

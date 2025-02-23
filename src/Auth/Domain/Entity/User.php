@@ -93,4 +93,14 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     {
         return $this->status === UserStatus::ACTIVE->value;
     }
+
+    public function hasRole(string $role): bool
+    {
+        return in_array($role, $this->roles, true);
+    }
+
+    public function doesNotHaveRole(string $role): bool
+    {
+        return !$this->hasRole($role);
+    }
 }

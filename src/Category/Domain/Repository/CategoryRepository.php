@@ -15,4 +15,14 @@ interface CategoryRepository extends Repository
     public function findByName(string $name): ?Category;
 
     public function findBySlug(?string $slug): ?Category;
+
+    /**
+     * @return array<Category>
+     */
+    public function findRootCategories(): array;
+
+    /**
+     * @return array<Category>
+     */
+    public function findAllCategories(): array;
 }
