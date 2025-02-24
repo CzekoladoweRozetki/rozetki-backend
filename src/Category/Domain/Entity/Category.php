@@ -33,6 +33,9 @@ class Category extends BaseEntity
         #[OneToMany(targetEntity: Category::class, mappedBy: 'parent')]
         private Collection $children = new ArrayCollection(),
     ) {
+        if ($this->isInvalidSlug($slug)) {
+            throw new \InvalidArgumentException('Invalid slug');
+        }
         parent::__construct($id);
     }
 
@@ -57,5 +60,28 @@ class Category extends BaseEntity
     public function getChildren(): Collection
     {
         return $this->children;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setParent(mixed $parent): void
+    {
+        $this->parent = $parent;
+    }
+
+    public function setSlug(string $slug): void
+    {
+        if ($this->isInvalidSlug($slug)) {
+            throw new \InvalidArgumentException('Invalid slug');
+        }
+        $this->slug = $slug;
+    }
+
+    private function isInvalidSlug(string $slug): bool
+    {
+        return !preg_match('/^[a-z0-9-]+$/', $slug);
     }
 }

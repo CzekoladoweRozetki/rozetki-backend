@@ -37,7 +37,7 @@ class CategorySingleProvider implements ProviderInterface
             id: $category->id->toString(),
             name: $category->name,
             slug: $category->slug,
-            parent: $category->parent->toString(),
+            parent: $category->parent?->toString(),
         );
     }
 }

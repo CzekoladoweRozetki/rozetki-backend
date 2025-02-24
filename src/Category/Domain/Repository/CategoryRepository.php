@@ -8,7 +8,7 @@ use App\Category\Domain\Entity\Category;
 use App\Common\Domain\Repository\Repository;
 
 /**
- * @extends Repository<Category>
+ * @template-extends Repository<Category>
  */
 interface CategoryRepository extends Repository
 {
