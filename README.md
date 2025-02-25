@@ -39,3 +39,9 @@ To create new Api endpoint you need to:
 - Create providers for Get and GetCollection operations in /module/Infrastructure/API/Provider
 - Create processors for Post, Patch and Delete operations in /module/Infrastructure/API/Processor
 - Patch, Put, Delete ale need to point single provider
+
+## Security
+
+Each command and query should have security voter. They is messenger middleware for authorization.
+Commands and queries have ExecutionContext argument that indicates context of calling like web, console, internal.
+For web context authorization is on by default. If you want omit authorization you can use internal execution context.

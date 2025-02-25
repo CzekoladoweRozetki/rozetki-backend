@@ -9,8 +9,10 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Category\Infrastructure\Api\DTO\CategoryInputDTO;
 use App\Category\Infrastructure\Api\Processor\CategoryPostProcessor;
+use App\Category\Infrastructure\Api\Processor\CategoryPutProcessor;
 use App\Category\Infrastructure\Api\Provider\CategoryCollectionProvider;
 use App\Category\Infrastructure\Api\Provider\CategorySingleProvider;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -20,6 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post(input: CategoryInputDTO::class, processor: CategoryPostProcessor::class),
         new Get(provider: CategorySingleProvider::class),
         new GetCollection(provider: CategoryCollectionProvider::class),
+        new Put(provider: CategorySingleProvider::class, processor: CategoryPutProcessor::class),
     ]
 )]
 class Category

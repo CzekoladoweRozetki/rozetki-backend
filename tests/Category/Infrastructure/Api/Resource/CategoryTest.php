@@ -230,4 +230,117 @@ class CategoryTest extends ApiTestCase
             'member' => [],
         ]);
     }
+
+    public function testShouldUpdateCategory(): void
+    {
+        // Given
+        $category = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $payload = [
+            'id' => $category->getId()->toString(),
+            'name' => 'Updated Electronics',
+            'slug' => 'updated-electronics',
+        ];
+
+        // When
+        $response = $this->client->request(
+            'PUT',
+            self::API_URL.'/'.$category->getId()->toString(),
+            ['json' => $payload]
+        );
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'id' => $category->getId()->toString(),
+            'name' => 'Updated Electronics',
+            'slug' => 'updated-electronics',
+        ]);
+    }
+
+    public function testShouldUpdateCategoryWithParent(): void
+    {
+        // Given
+        $parent = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $category = CategoryFactory::createOne([
+            'name' => 'Laptops',
+            'slug' => 'laptops',
+        ]);
+
+        $payload = [
+            'id' => $category->getId()->toString(),
+            'name' => 'Gaming Laptops',
+            'slug' => 'gaming-laptops',
+            'parent' => $parent->getId()->__toString(),
+        ];
+
+        // When
+        $response = $this->client->request('PUT', self::API_URL.'/'.$category->getId(), ['json' => $payload]);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'name' => 'Gaming Laptops',
+            'slug' => 'gaming-laptops',
+            'parent' => $parent->getId()->__toString(),
+        ]);
+    }
+
+    public function testShouldReturn422WhenUpdatingWithEmptyName(): void
+    {
+        // Given
+        $category = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $payload = [
+            'id' => $category->getId()->toString(),
+            'name' => '',
+            'slug' => 'electronics',
+        ];
+
+        // When
+        $this->client->request('PUT', self::API_URL.'/'.$category->getId(), ['json' => $payload]);
+
+        // Then
+        self::assertResponseStatusCodeSame(422);
+        self::assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        self::assertJsonContains([
+            'detail' => 'name: Name should not be blank',
+        ]);
+    }
+
+    public function testShouldReturn400WhenUpdatingWithNonExistentParent(): void
+    {
+        // Given
+        $category = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $payload = [
+            'id' => $category->getId()->toString(),
+            'name' => 'Updated Electronics',
+            'slug' => 'updated-electronics',
+            'parent' => Uuid::v4()->__toString(),
+        ];
+
+        // When
+        $this->client->request('PUT', self::API_URL.'/'.$category->getId(), ['json' => $payload]);
+
+        // Then
+        self::assertResponseStatusCodeSame(400);
+        self::assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        self::assertJsonContains([
+            'detail' => 'Category not found',
+        ]);
+    }
 }
