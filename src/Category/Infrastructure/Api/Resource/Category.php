@@ -6,6 +6,7 @@ namespace App\Category\Infrastructure\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -13,6 +14,7 @@ use ApiPlatform\Metadata\Put;
 use App\Category\Infrastructure\Api\DTO\CategoryInputDTO;
 use App\Category\Infrastructure\Api\Processor\CategoryPostProcessor;
 use App\Category\Infrastructure\Api\Processor\CategoryPutProcessor;
+use App\Category\Infrastructure\Api\Processor\CategoryRemoveProcessor;
 use App\Category\Infrastructure\Api\Provider\CategoryCollectionProvider;
 use App\Category\Infrastructure\Api\Provider\CategorySingleProvider;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,6 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(provider: CategorySingleProvider::class),
         new GetCollection(provider: CategoryCollectionProvider::class),
         new Put(provider: CategorySingleProvider::class, processor: CategoryPutProcessor::class),
+        new Delete(provider: CategorySingleProvider::class, processor: CategoryRemoveProcessor::class),
     ]
 )]
 class Category

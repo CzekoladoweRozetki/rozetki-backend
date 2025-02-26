@@ -7,6 +7,7 @@ namespace App\Tests\Category\Infrastructure\Api\Resource;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Auth\Domain\UserRole;
+use App\Category\Domain\Repository\CategoryRepository;
 use App\Factory\CategoryFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\Uid\Uuid;
@@ -330,7 +331,7 @@ class CategoryTest extends ApiTestCase
             'id' => $category->getId()->toString(),
             'name' => 'Updated Electronics',
             'slug' => 'updated-electronics',
-            'parent' => Uuid::v4()->__toString(),
+            'parent' => Uuid::v4(),
         ];
 
         // When
@@ -342,5 +343,102 @@ class CategoryTest extends ApiTestCase
         self::assertJsonContains([
             'detail' => 'Category not found',
         ]);
+    }
+
+    public function testShouldRemoveCategory(): void
+    {
+        // Given
+        $category = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        // When
+        $this->client->request('DELETE', self::API_URL.'/'.$category->getId());
+
+        // Then
+        self::assertResponseStatusCodeSame(204);
+
+        // Verify category is removed
+        /** @var CategoryRepository $repository */
+        $repository = self::getContainer()->get(CategoryRepository::class);
+        $removedCategory = $repository->findOneById($category->getId());
+        self::assertNull($removedCategory);
+    }
+
+    public function testShouldRemoveCategoryWithChildren(): void
+    {
+        // Given
+        $parent = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $child = CategoryFactory::createOne([
+            'name' => 'Laptops',
+            'slug' => 'laptops',
+            'parent' => $parent,
+        ]);
+
+        // When
+        $this->client->request('DELETE', self::API_URL.'/'.$parent->getId());
+
+        // Then
+        self::assertResponseStatusCodeSame(204);
+
+        // Verify parent is removed
+        $repository = self::getContainer()->get(CategoryRepository::class);
+        $removedParent = $repository->findOneById($parent->getId());
+        self::assertNull($removedParent);
+
+        // Verify child is removed
+        $removedChild = $repository->findOneById($child->getId());
+        self::assertNull($removedChild);
+    }
+
+    public function testShouldRemoveChildCategoryWithoutAffectingParent(): void
+    {
+        // Given
+        $parent = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $child = CategoryFactory::createOne([
+            'name' => 'Laptops',
+            'slug' => 'laptops',
+            'parent' => $parent,
+        ]);
+
+        // When
+        $this->client->request('DELETE', self::API_URL.'/'.$child->getId());
+
+        // Then
+        self::assertResponseStatusCodeSame(204);
+
+        // Verify child is removed
+        $repository = self::getContainer()->get(CategoryRepository::class);
+        $removedChild = $repository->findOneById($child->getId());
+        self::assertNull($removedChild);
+
+        // Verify parent still exists
+        $existingParent = $repository->findOneById($parent->getId());
+        self::assertNotNull($existingParent);
+    }
+
+    public function testShouldRequireAuthentication(): void
+    {
+        // Given
+        $this->client = static::createClient();
+        $category = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        // When
+        $this->client->request('DELETE', self::API_URL.'/'.$category->getId());
+
+        // Then
+        self::assertResponseStatusCodeSame(401);
     }
 }

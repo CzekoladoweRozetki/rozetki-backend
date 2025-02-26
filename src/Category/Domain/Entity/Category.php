@@ -28,9 +28,9 @@ class Category extends BaseEntity
         private string $name,
         #[Column(type: 'string', length: 255, unique: true)]
         private string $slug,
-        #[ManyToOne(targetEntity: Category::class, inversedBy: 'children')]
+        #[ManyToOne(targetEntity: Category::class, inversedBy: 'children', cascade: ['persist'])]
         private ?Category $parent = null,
-        #[OneToMany(targetEntity: Category::class, mappedBy: 'parent')]
+        #[OneToMany(targetEntity: Category::class, mappedBy: 'parent', cascade: ['persist', 'remove'])]
         private Collection $children = new ArrayCollection(),
     ) {
         if ($this->isInvalidSlug($slug)) {
