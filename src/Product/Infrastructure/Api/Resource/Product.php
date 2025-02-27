@@ -27,6 +27,7 @@ readonly class Product
 {
     /**
      * @param array<ProductVariant> $variants
+     * @param array<int, string>    $categories
      */
     public function __construct(
         #[ApiProperty(identifier: true)]
@@ -38,6 +39,8 @@ readonly class Product
         public string $description,
         #[Groups(['product'])]
         public array $variants = [],
+        #[Groups(['product'])]
+        public array $categories = [],
     ) {
     }
 }

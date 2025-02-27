@@ -18,6 +18,10 @@ readonly class CreateProductCommand extends Command
          * @var ProductVariantDTO[]
          */
         public array $variants = [],
+        /**
+         * @var array<int, string>
+         */
+        public array $categories = [],
         public ExecutionContext $executionContext = ExecutionContext::Web,
     ) {
         parent::__construct($executionContext);

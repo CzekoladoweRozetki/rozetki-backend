@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Product\Infrastructure\API\Resource;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Factory\CategoryFactory;
 use App\Factory\ProductFactory;
 use App\Factory\ProductVariantFactory;
 use App\Factory\UserFactory;
@@ -20,6 +21,8 @@ use Zenstruck\Foundry\Test\Factories;
 class ProductTest extends ApiTestCase
 {
     use Factories;
+
+    public const API_URL = '/api/products';
 
     public function testCreateProduct(): void
     {
@@ -202,5 +205,132 @@ class ProductTest extends ApiTestCase
         $deletedProduct = $productRepository->findOneById($product->getId());
 
         $this->assertNull($deletedProduct);
+    }
+
+    public function testShouldCreateProductWithCategories(): void
+    {
+        $client = static::createClient();
+        // Given
+        $category1 = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $category2 = CategoryFactory::createOne([
+            'name' => 'Laptops',
+            'slug' => 'laptops',
+        ]);
+
+        $payload = [
+            'name' => 'Test Product',
+            'description' => 'This is a test product with categories',
+            'categories' => [
+                $category1->getId()->toString(),
+                $category2->getId()->toString(),
+            ],
+        ];
+
+        // When
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+
+        $client->loginUser($user);
+
+        $response = $client->request('POST', self::API_URL, ['json' => $payload]);
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseStatusCodeSame(201);
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        self::assertJsonContains([
+            'name' => 'Test Product',
+            'description' => 'This is a test product with categories',
+            'categories' => [
+                $category1->getId()->toString(),
+                $category2->getId()->toString(),
+            ],
+        ]);
+        self::assertTrue(Uuid::isValid($content['id']));
+    }
+
+    public function testShouldCreateProductWithVariantsAndCategories(): void
+    {
+        // Given
+        $client = static::createClient();
+        $category = CategoryFactory::createOne([
+            'name' => 'Electronics',
+            'slug' => 'electronics',
+        ]);
+
+        $payload = [
+            'name' => 'Smartphone',
+            'description' => 'Latest smartphone model',
+            'variants' => [
+                [
+                    'name' => '128GB Model',
+                    'description' => 'Basic storage option',
+                ],
+                [
+                    'name' => '256GB Model',
+                    'description' => 'Extended storage option',
+                ],
+            ],
+            'categories' => [
+                $category->getId()->toString(),
+            ],
+        ];
+
+        // When
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+
+        $client->loginUser($user);
+
+        $response = $client->request('POST', self::API_URL, ['json' => $payload]);
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseStatusCodeSame(201);
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        self::assertJsonContains([
+            'name' => 'Smartphone',
+            'description' => 'Latest smartphone model',
+            'categories' => [
+                $category->getId()->toString(),
+            ],
+        ]);
+
+        self::assertCount(2, $content['variants']);
+        self::assertEquals('128GB Model', $content['variants'][0]['name']);
+        self::assertEquals('Basic storage option', $content['variants'][0]['description']);
+        self::assertEquals('256GB Model', $content['variants'][1]['name']);
+        self::assertEquals('Extended storage option', $content['variants'][1]['description']);
+        self::assertTrue(Uuid::isValid($content['id']));
+    }
+
+    public function testShouldReturn400WhenCategoryDoesNotExist(): void
+    {
+        // Given
+        $client = static::createClient();
+
+        $payload = [
+            'name' => 'Test Product',
+            'description' => 'This is a test product',
+            'categories' => [
+                Uuid::v4()->toString(),
+            ],
+        ];
+
+        // When
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+
+        $client->loginUser($user);
+
+        $client->request('POST', self::API_URL, ['json' => $payload]);
+
+        // Then
+        self::assertResponseStatusCodeSame(400);
+        self::assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        self::assertJsonContains([
+            'detail' => 'Category not found',
+        ]);
     }
 }

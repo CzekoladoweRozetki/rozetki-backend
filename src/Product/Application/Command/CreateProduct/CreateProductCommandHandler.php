@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Product\Application\Command\CreateProduct;
 
+use App\Category\Application\Query\GetCategory\GetCategoryQuery;
+use App\Category\Domain\Exception\CategoryNotFoundException;
 use App\Common\Application\Event\EventBus;
+use App\Common\Application\Query\QueryBus;
 use App\Product\Domain\Entity\Product;
 use App\Product\Domain\Event\Partial\ProductVariant;
 use App\Product\Domain\Event\ProductCreatedEvent;
@@ -12,6 +15,7 @@ use App\Product\Domain\Repository\ProductRepository;
 use App\Product\Domain\Repository\ProductVariantRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Uid\Uuid;
 
 #[AsMessageHandler]
 class CreateProductCommandHandler
@@ -21,15 +25,27 @@ class CreateProductCommandHandler
         private ProductVariantRepository $productVariantRepository,
         private SluggerInterface $slugger,
         private EventBus $eventBus,
+        private QueryBus $queryBus,
     ) {
     }
 
     public function __invoke(CreateProductCommand $command): void
     {
+        foreach ($command->categories as $categoryId) {
+            $categoryId = Uuid::fromString($categoryId);
+            $category = $this->queryBus->query(
+                new GetCategoryQuery($categoryId, executionContext: $command->executionContext)
+            );
+            if (null === $category) {
+                throw new CategoryNotFoundException();
+            }
+        }
+
         $product = new Product(
             $command->id,
             $command->name,
-            $command->description
+            $command->description,
+            categories: $command->categories,
         );
 
         foreach ($command->variants as $variant) {

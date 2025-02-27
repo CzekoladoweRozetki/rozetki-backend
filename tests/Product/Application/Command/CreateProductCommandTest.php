@@ -6,6 +6,7 @@ namespace App\Tests\Product\Application\Command;
 
 use App\Common\Application\Event\EventBus;
 use App\Common\Infrastructure\Security\ExecutionContext;
+use App\Factory\CategoryFactory;
 use App\Product\Application\Command\CreateProduct\CreateProductCommand;
 use App\Product\Application\Command\CreateProduct\ProductVariantDTO;
 use App\Product\Domain\Event\ProductCreatedEvent;
@@ -99,5 +100,45 @@ class CreateProductCommandTest extends KernelTestCase
         $this->assertEquals('First variant description', $variantsArray[0]->getDescription());
         $this->assertEquals('Variant 2', $variantsArray[1]->getName());
         $this->assertEquals('Second variant description', $variantsArray[1]->getDescription());
+    }
+
+    public function testCreateProductWithCategories(): void
+    {
+        // Given
+        $productId = Uuid::v4();
+        $category1 = CategoryFactory::createOne([
+            'name' => 'Category 1',
+            'slug' => 'category-1',
+        ]);
+        $categoryId2 = Uuid::v4()->toString();
+        $category2 = CategoryFactory::createOne([
+            'name' => 'Category 2',
+            'slug' => 'category-2',
+        ]);
+
+        $command = new CreateProductCommand(
+            $productId,
+            'Test Product With Categories',
+            'This is a product with categories',
+            [],
+            [$category1->getId()->toString(), $category2->getId()->toString()],
+            ExecutionContext::Internal
+        );
+
+        // When
+        $this->commandBus->dispatch($command);
+
+        // Then
+        $productRepository = self::getContainer()->get(ProductRepository::class);
+        $product = $productRepository->find($productId);
+
+        $this->assertNotNull($product);
+        $this->assertEquals('Test Product With Categories', $product->getName());
+        $this->assertEquals('This is a product with categories', $product->getDescription());
+
+        $categories = $product->getCategories();
+        $this->assertCount(2, $categories);
+        $this->assertContains($category1->getId()->toString(), $categories);
+        $this->assertContains($category2->getId()->toString(), $categories);
     }
 }

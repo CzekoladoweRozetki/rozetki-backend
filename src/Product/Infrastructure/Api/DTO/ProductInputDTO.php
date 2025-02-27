@@ -13,6 +13,10 @@ readonly class ProductInputDTO
          * @var ProductVariantInputDTO[]
          */
         public array $variants = [],
+        /**
+         * @var array<int, string>
+         */
+        public array $categories = [],
     ) {
     }
 }

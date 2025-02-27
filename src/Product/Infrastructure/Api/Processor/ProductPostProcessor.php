@@ -14,6 +14,7 @@ use App\Product\Application\Query\GetProductById\GetProductByIdQuery;
 use App\Product\Infrastructure\Api\DTO\ProductInputDTO;
 use App\Product\Infrastructure\Api\Resource\Product;
 use App\Product\Infrastructure\Api\Resource\ProductVariant;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -37,10 +38,15 @@ class ProductPostProcessor implements ProcessorInterface
             Uuid::v4(),
             $data->name,
             $data->description,
-            $variants
+            $variants,
+            $data->categories,
         );
 
-        $this->commandBus->dispatch($command);
+        try {
+            $this->commandBus->dispatch($command);
+        } catch (HandlerFailedException $e) {
+            throw $e->getPrevious();
+        }
 
         $query = new GetProductByIdQuery($command->id);
         $product = $this->queryBus->query($query);
@@ -57,7 +63,8 @@ class ProductPostProcessor implements ProcessorInterface
                     $variant->slug,
                 ),
                 $product->variants
-            )
+            ),
+            $data->categories,
         );
     }
 }

@@ -34,6 +34,10 @@ class Product extends BaseEntity
             'remove',
         ], fetch: 'EAGER', orphanRemoval: true)]
         private Collection $variants = new ArrayCollection(),
+        /**
+         * @var array<int, string>
+         */
+        private array $categories = [],
     ) {
         parent::__construct($id);
     }
@@ -72,5 +76,13 @@ class Product extends BaseEntity
                 )
             );
         }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getCategories(): array
+    {
+        return $this->categories;
     }
 }
