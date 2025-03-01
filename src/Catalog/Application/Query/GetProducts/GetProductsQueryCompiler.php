@@ -24,6 +24,7 @@ class GetProductsQueryCompiler
         array $filters = [],
         int $page = 1,
         int $limit = 10,
+        ?string $categorySlug = null,
     ): Statement {
         $baseQuery = 'SELECT * FROM catalog_product';
         $where = [];
@@ -32,17 +33,22 @@ class GetProductsQueryCompiler
         // search with fulltext search (tsvector) and fuzzy matching
         if ($search) {
             $where[] = 'search_vector @@ to_tsquery(:search)
-                OR similarity(name, :rawQuery) > 0.1
-                OR similarity(description, :rawQuery) > 0.1';
+                        OR similarity(name, :rawQuery) > 0.1
+                        OR similarity(description, :rawQuery) > 0.1';
             $params['search'] = $this->buildPartialTsQuery($search);
             $params['rawQuery'] = $search;
         }
 
-        // filter by category
-        if (isset($filters['category'])) {
-            $where[] = 'category = :category';
-            $params['category'] = $filters['category'];
+        // filter by category slug
+        if ($categorySlug) {
+            // Check if any category in the data->categories array has the specified slug
+            $where[] = "EXISTS (
+                        SELECT 1 FROM jsonb_array_elements(data->'categories') AS category
+                        WHERE category->>'slug' = :categorySlug
+                    )";
+            $params['categorySlug'] = $categorySlug;
         }
+
         // order
         $orderBy = 'ORDER BY name ASC';
 

@@ -44,4 +44,9 @@ class DoctrineCategoryRepository extends ServiceEntityRepository implements Cate
     {
         return $this->findAll();
     }
+
+    public function findCategoriesByIds(array $ids): array
+    {
+        return $this->findBy(['id' => $ids]);
+    }
 }

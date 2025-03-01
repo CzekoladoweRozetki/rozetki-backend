@@ -21,7 +21,11 @@ class GetCategoriesQueryHandler
      */
     public function __invoke(GetCategoriesQuery $query): array
     {
-        $categories = $this->categoryRepository->findAllCategories();
+        if (count($query->ids) > 0) {
+            $categories = $this->categoryRepository->findCategoriesByIds($query->ids);
+        } else {
+            $categories = $this->categoryRepository->findAllCategories();
+        }
 
         return array_map(function (Category $category) {
             return new CategoryDTO(

@@ -6,6 +6,7 @@ namespace App\Tests\Catalog\Infrastructure\EventHandler;
 
 use App\Catalog\Domain\Repository\CatalogProductRepository;
 use App\Common\Application\Event\EventBus;
+use App\Factory\CategoryFactory;
 use App\Product\Domain\Event\Partial\ProductVariant;
 use App\Product\Domain\Event\ProductCreatedEvent;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -31,6 +32,8 @@ class ProductCreatedEventHandlerTest extends KernelTestCase
         // Arrange
         $productId = Uuid::v4();
         $variantId = Uuid::v4();
+        $category1 = CategoryFactory::createOne();
+        $category2 = CategoryFactory::createOne();
         $event = new ProductCreatedEvent(
             $productId->toString(),
             'Test Product',
@@ -40,9 +43,10 @@ class ProductCreatedEventHandlerTest extends KernelTestCase
                     $variantId->toString(),
                     'Test Variant',
                     'Test Variant Description',
-                    'test-variant'
+                    'test-variant',
                 ),
-            ]
+            ],
+            [$category1->getId()->toString(), $category2->getId()->toString()],
         );
 
         // Act
@@ -54,5 +58,17 @@ class ProductCreatedEventHandlerTest extends KernelTestCase
         self::assertEquals('Test Variant', $catalogProduct->getName());
         self::assertEquals('Test Variant Description', $catalogProduct->getDescription());
         self::assertEquals('test-variant', $catalogProduct->getSlug());
+
+        self::assertArrayHasKey('categories', $catalogProduct->getData());
+        self::assertCount(2, $catalogProduct->getData()['categories']);
+
+        $categoryData = $catalogProduct->getData()['categories'];
+        $categoryNames = array_column($categoryData, 'name');
+        $categorySlugs = array_column($categoryData, 'slug');
+
+        self::assertContains($category1->getName(), $categoryNames);
+        self::assertContains($category2->getName(), $categoryNames);
+        self::assertContains($category1->getSlug(), $categorySlugs);
+        self::assertContains($category2->getSlug(), $categorySlugs);
     }
 }

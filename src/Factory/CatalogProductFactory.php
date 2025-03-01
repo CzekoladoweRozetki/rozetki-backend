@@ -35,6 +35,7 @@ final class CatalogProductFactory extends PersistentProxyObjectFactory
             'description' => self::faker()->text(),
             'name' => self::faker()->text(255),
             'slug' => self::faker()->slug(4),
+            'data' => null,
         ];
     }
 

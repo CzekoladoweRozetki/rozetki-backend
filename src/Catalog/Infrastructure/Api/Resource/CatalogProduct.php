@@ -44,17 +44,29 @@ use App\Catalog\Infrastructure\Api\Provider\CatalogProductSingleProvider;
                     description: 'The search query',
                     required: false
                 ),
+                'c' => new QueryParameter(
+                    key: 'c',
+                    schema: [
+                        'type' => 'string',
+                    ],
+                    description: 'The category slug',
+                    required: false
+                ),
             ]
         ),
     ]
 )]
 class CatalogProduct
 {
+    /**
+     * @param array<int, array<string, string>> $categories
+     */
     public function __construct(
         #[ApiProperty(identifier: true, description: 'The slug of the product')]
         public string $id,
         public string $name,
         public string $description,
+        public array $categories,
     ) {
     }
 }

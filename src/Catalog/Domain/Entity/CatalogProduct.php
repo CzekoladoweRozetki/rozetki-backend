@@ -15,6 +15,7 @@ use Symfony\Component\Uid\Uuid;
 #[Entity]
 #[Index(columns: ['search_vector'], flags: ['gin'])]
 #[Index(columns: ['slug'])]
+#[Index(name: "catalog_product_category_idx", columns: ["data"], flags: ["gin"], options: ["expressions" => ["(data->'categories')"]])]
 class CatalogProduct extends BaseEntity
 {
     public function __construct(

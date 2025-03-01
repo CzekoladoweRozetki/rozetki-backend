@@ -33,6 +33,14 @@ class GetProductQueryHandler
         $result = $statement->executeQuery();
         $result = $result->fetchAssociative();
 
-        return $result ?: null;
+        if (!$result) {
+            return null;
+        }
+
+        $data = (null !== $result['data']) ? json_decode($result['data'], true) : null;
+        $data = $data ? $data : [];
+        $result['categories'] = $data['categories'] ?? [];
+
+        return $result;
     }
 }

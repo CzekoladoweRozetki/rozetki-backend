@@ -25,4 +25,11 @@ interface CategoryRepository extends Repository
      * @return array<Category>
      */
     public function findAllCategories(): array;
+
+    /**
+     * @param array<int, string> $ids
+     *
+     * @return array<Category>
+     */
+    public function findCategoriesByIds(array $ids): array;
 }

@@ -29,6 +29,7 @@ class CatalogProductSingleProvider implements ProviderInterface
             $product['slug'],
             $product['name'],
             $product['description'],
+            $product['categories'],
         ) : null;
     }
 }

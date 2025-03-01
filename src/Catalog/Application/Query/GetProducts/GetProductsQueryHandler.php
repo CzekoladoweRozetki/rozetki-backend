@@ -23,17 +23,22 @@ class GetProductsQueryHandler
             search: $query->search,
             filters: [],
             page: $query->page,
-            limit: $query->limit
+            limit: $query->limit,
+            categorySlug: $query->categorySlug,
         );
         $result = $stmt->executeQuery();
 
         $productData = $result->fetchAllAssociative();
 
         return array_map(function ($product) {
+            $data = $product['data'] !== (null) ? json_decode($product['data'], true) : [];
+            $data['categories'] = $data['categories'] ?? [];
+
             return new CatalogProductDTO(
                 $product['name'],
                 $product['description'],
                 $product['slug'],
+                $data['categories']
             );
         },
             $productData);

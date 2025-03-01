@@ -11,12 +11,14 @@ readonly class ProductCreatedEvent extends Event
 {
     /**
      * @param array<ProductVariant> $variants
+     * @param array<int, string>    $categories
      */
     public function __construct(
         public string $productId,
         public string $name,
         public string $description,
         public array $variants,
+        public array $categories,
     ) {
     }
 
