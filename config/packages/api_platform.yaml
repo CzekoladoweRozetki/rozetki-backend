@@ -12,6 +12,7 @@ api_platform:
             - '%kernel.project_dir%/src/Product/Infrastructure/Api/Resource'
             - '%kernel.project_dir%/src/Catalog/Infrastructure/Api/Resource'
             - '%kernel.project_dir%/src/Category/Infrastructure/Api/Resource'
+            - '%kernel.project_dir%/src/Attribute/Infrastructure/Api/Resource'
     formats:
         json:
             mime_types: [ 'application/json' ]
@@ -20,4 +21,8 @@ api_platform:
     
     exception_to_status:
         DomainException: 400
+        InvalidArgumentException: 400
+        ValidationException: 400
+        Symfony\Component\Validator\Exception\ValidationFailedException: 400
+        Symfony\Component\Messenger\Exception\ValidationFailedException: 400
 

@@ -7,6 +7,7 @@ namespace App\Attribute\Application\Command\CreateAttribute;
 use App\Common\Application\Command\Command;
 use App\Common\Infrastructure\Security\ExecutionContext;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 readonly class CreateAttributeCommand extends Command
 {
@@ -15,6 +16,7 @@ readonly class CreateAttributeCommand extends Command
      */
     public function __construct(
         public Uuid $id,
+        #[NotBlank]
         public string $name,
         public array $values = [],
         public ?Uuid $parentId = null,
