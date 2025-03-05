@@ -8,6 +8,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Attribute\Domain\Entity\Attribute as AttributeEntity;
 use App\Attribute\Domain\Repository\AttributeRepository;
 use App\Factory\AttributeFactory;
+use App\Factory\AttributeValueFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
@@ -43,12 +44,22 @@ class AttributeTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertJsonContains([
             'name' => 'Color',
-            'values' => ['Red', 'Green', 'Blue'],
         ]);
 
         $responseData = $response->toArray();
-        $attributeId = $responseData['id'];
+        $this->assertEquals('Color', $responseData['name']);
+        $this->assertCount(3, $responseData['values']);
 
+        // Check if values contain the expected strings
+        $valueTexts = array_map(
+            fn ($value) => $value['value'],
+            $responseData['values']
+        );
+        $this->assertContains('Red', $valueTexts);
+        $this->assertContains('Green', $valueTexts);
+        $this->assertContains('Blue', $valueTexts);
+
+        $attributeId = $responseData['id'];
         $attributeRepository = self::getContainer()->get(AttributeRepository::class);
         $attribute = $attributeRepository->findOneById(Uuid::fromString($attributeId));
 
@@ -85,13 +96,24 @@ class AttributeTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertJsonContains([
             'name' => 'Size',
-            'values' => ['Small', 'Medium', 'Large'],
             'parentId' => $parentAttribute->getId()->toString(),
         ]);
 
         $responseData = $response->toArray();
-        $attributeId = $responseData['id'];
+        $this->assertEquals('Size', $responseData['name']);
+        $this->assertEquals($parentAttribute->getId()->toString(), $responseData['parentId']);
+        $this->assertCount(3, $responseData['values']);
 
+        // Check if values contain the expected strings
+        $valueTexts = array_map(
+            fn ($value) => $value['value'],
+            $responseData['values']
+        );
+        $this->assertContains('Small', $valueTexts);
+        $this->assertContains('Medium', $valueTexts);
+        $this->assertContains('Large', $valueTexts);
+
+        $attributeId = $responseData['id'];
         $attributeRepository = self::getContainer()->get(AttributeRepository::class);
         $attribute = $attributeRepository->findOneById(Uuid::fromString($attributeId));
 
@@ -169,5 +191,128 @@ class AttributeTest extends ApiTestCase
         $this->assertJsonContains([
             'detail' => 'Parent attribute not found',
         ]);
+    }
+
+    public function testGetAttribute(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        /** @var AttributeEntity $attribute */
+        $attribute = AttributeFactory::createOne([
+            'name' => 'Material',
+        ]);
+
+        // Add values to the attribute
+        AttributeValueFactory::createOne([
+            'value' => 'Cotton',
+            'attribute' => $attribute,
+        ]);
+        AttributeValueFactory::createOne([
+            'value' => 'Polyester',
+            'attribute' => $attribute,
+        ]);
+        AttributeValueFactory::createOne([
+            'value' => 'Wool',
+            'attribute' => $attribute,
+        ]);
+
+        // When
+        $response = $client->request('GET', self::API_URL.'/'.$attribute->getId()->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertJsonContains([
+            'id' => $attribute->getId()->toString(),
+            'name' => 'Material',
+        ]);
+
+        $responseData = $response->toArray();
+        $this->assertCount(3, $responseData['values']);
+
+        // Verify that each value has the expected structure
+        foreach ($responseData['values'] as $value) {
+            $this->assertArrayHasKey('id', $value);
+            $this->assertArrayHasKey('value', $value);
+            $this->assertArrayHasKey('attributeId', $value);
+            $this->assertEquals($attribute->getId()->toString(), $value['attributeId']);
+        }
+    }
+
+    public function testGetAttributeWithParent(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        /** @var AttributeEntity $parentAttribute */
+        $parentAttribute = AttributeFactory::createOne([
+            'name' => 'Product Specifications',
+        ]);
+
+        /** @var AttributeEntity $attribute */
+        $attribute = AttributeFactory::createOne([
+            'name' => 'Weight',
+            'parent' => $parentAttribute,
+        ]);
+
+        // Add values to the attribute
+        AttributeValueFactory::createOne([
+            'value' => 'Light',
+            'attribute' => $attribute,
+        ]);
+
+        // When
+        $response = $client->request('GET', self::API_URL.'/'.$attribute->getId()->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertJsonContains([
+            'id' => $attribute->getId()->toString(),
+            'name' => 'Weight',
+            'parentId' => $parentAttribute->getId()->toString(),
+        ]);
+
+        $responseData = $response->toArray();
+        $this->assertCount(1, $responseData['values']);
+        $this->assertEquals('Light', $responseData['values'][0]['value']);
+    }
+
+    public function testGetAttributeWithoutAdminRole(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
+        $client->loginUser($user);
+
+        /** @var AttributeEntity $attribute */
+        $attribute = AttributeFactory::createOne([
+            'name' => 'Color',
+        ]);
+
+        // When
+        $client->request('GET', self::API_URL.'/'.$attribute->getId()->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testGetNonExistentAttribute(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        $nonExistentId = Uuid::v4()->toString();
+
+        // When
+        $client->request('GET', self::API_URL.'/'.$nonExistentId);
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 }
