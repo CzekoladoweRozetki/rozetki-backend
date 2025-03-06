@@ -315,4 +315,148 @@ class AttributeTest extends ApiTestCase
         // Then
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
+
+    public function testDeleteAttribute(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        /** @var AttributeEntity $attribute */
+        $attribute = AttributeFactory::createOne([
+            'name' => 'Texture',
+        ]);
+
+        $attributeId = $attribute->getId();
+
+        // Add values to the attribute
+        AttributeValueFactory::createMany(2, [
+            'attribute' => $attribute,
+        ]);
+
+        // When
+        $client->request('DELETE', self::API_URL.'/'.$attributeId->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+
+        $attributeRepository = self::getContainer()->get(AttributeRepository::class);
+        $deletedAttribute = $attributeRepository->findOneById($attributeId);
+        $this->assertNull($deletedAttribute);
+    }
+
+    public function testDeleteAttributeWithChildren(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        /** @var AttributeEntity $parentAttribute */
+        $parentAttribute = AttributeFactory::createOne([
+            'name' => 'Parent Feature',
+        ]);
+
+        /** @var AttributeEntity $childAttribute */
+        $childAttribute = AttributeFactory::createOne([
+            'name' => 'Child Feature',
+            'parent' => $parentAttribute,
+        ]);
+
+        $parentId = $parentAttribute->getId();
+        $childId = $childAttribute->getId();
+
+        // When
+        $client->request('DELETE', self::API_URL.'/'.$parentId->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+
+        $attributeRepository = self::getContainer()->get(AttributeRepository::class);
+
+        // Parent should be removed
+        $deletedParent = $attributeRepository->findOneById($parentId);
+        $this->assertNull($deletedParent);
+
+        $child = $attributeRepository->findOneById($childId);
+        $this->assertNull($child);
+    }
+
+    public function testDeleteAttributeWithoutAdminRole(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
+        $client->loginUser($user);
+
+        /** @var AttributeEntity $attribute */
+        $attribute = AttributeFactory::createOne([
+            'name' => 'Feature',
+        ]);
+
+        // When
+        $client->request('DELETE', self::API_URL.'/'.$attribute->getId()->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+
+        // Verify attribute still exists
+        $attributeRepository = self::getContainer()->get(AttributeRepository::class);
+        $this->assertNotNull($attributeRepository->findOneById($attribute->getId()));
+    }
+
+    public function testDeleteNonExistentAttribute(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        $nonExistentId = Uuid::v4()->toString();
+
+        // When
+        $client->request('DELETE', self::API_URL.'/'.$nonExistentId);
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
+
+    public function testDeleteAttributeCascadesValues(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        /** @var AttributeEntity $attribute */
+        $attribute = AttributeFactory::createOne([
+            'name' => 'Material',
+        ]);
+
+        // Add values to the attribute
+        $values = AttributeValueFactory::createMany(3, [
+            'attribute' => $attribute,
+        ]);
+
+        $valueIds = array_map(
+            fn ($value) => $value->getId()->toString(),
+            $values
+        );
+
+        // When
+        $client->request('DELETE', self::API_URL.'/'.$attribute->getId()->toString());
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+
+        $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Check that values are also deleted
+        foreach ($valueIds as $valueId) {
+            $value = $entityManager->getRepository('App\Attribute\Domain\Entity\AttributeValue')
+                ->find(Uuid::fromString($valueId));
+            $this->assertNull($value, 'Value was not deleted with its attribute');
+        }
+    }
 }

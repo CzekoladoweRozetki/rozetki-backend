@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -29,11 +30,12 @@ class Attribute extends BaseEntity
         #[Column(type: 'string', length: 255)]
         private string $name,
         #[ManyToOne(targetEntity: Attribute::class, inversedBy: 'children')]
+        #[JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
         private ?Attribute $parent = null,
         #[OneToMany(targetEntity: Attribute::class, mappedBy: 'parent', cascade: [
             'persist',
             'remove',
-        ], orphanRemoval: true)]
+        ], orphanRemoval: false)]
         private Collection $children = new ArrayCollection(),
         #[OneToMany(targetEntity: AttributeValue::class, mappedBy: 'attribute', cascade: [
             'persist',
@@ -84,5 +86,10 @@ class Attribute extends BaseEntity
         );
 
         $this->values->add($attributeValue);
+    }
+
+    public function addChild(Attribute $attribute): void
+    {
+        $this->children->add($attribute);
     }
 }

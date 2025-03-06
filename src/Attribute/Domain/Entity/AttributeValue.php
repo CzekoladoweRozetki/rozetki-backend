@@ -8,6 +8,7 @@ use App\Common\Domain\Entity\BaseEntity;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -20,6 +21,7 @@ class AttributeValue extends BaseEntity
         #[Column(type: UuidType::NAME)]
         protected Uuid $id,
         #[ManyToOne(targetEntity: Attribute::class, inversedBy: 'values')]
+        #[JoinColumn(name: 'attribute_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
         private Attribute $attribute,
         private mixed $value,
     ) {

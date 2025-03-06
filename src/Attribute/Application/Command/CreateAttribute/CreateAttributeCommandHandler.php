@@ -19,6 +19,7 @@ class CreateAttributeCommandHandler
 
     public function __invoke(CreateAttributeCommand $command): void
     {
+        /** @var Attribute|null $parent */
         $parent = $command->parentId ? $this->attributeRepository->findOneById($command->parentId) : null;
 
         if (!$parent && $command->parentId) {
@@ -30,6 +31,10 @@ class CreateAttributeCommandHandler
             name: $command->name,
             parent: $parent
         );
+
+        if ($parent) {
+            $parent->addChild($attribute);
+        }
 
         foreach ($command->values as $value) {
             $attribute->addValue($value);
