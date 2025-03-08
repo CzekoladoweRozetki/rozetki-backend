@@ -24,4 +24,12 @@ class DoctrineAttributeRepository extends ServiceEntityRepository implements Att
     {
         parent::__construct($registry, Attribute::class);
     }
+
+    /**
+     * @return Attribute[]
+     */
+    public function findAttributes(): array
+    {
+        return $this->findAll();
+    }
 }

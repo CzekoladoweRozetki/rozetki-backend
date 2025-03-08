@@ -82,7 +82,7 @@ class Attribute extends BaseEntity
         $attributeValue = new AttributeValue(
             id: Uuid::v4(),
             attribute: $this,
-            value: $value
+            value: $value,
         );
 
         $this->values->add($attributeValue);

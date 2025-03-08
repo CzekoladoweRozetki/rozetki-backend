@@ -459,4 +459,176 @@ class AttributeTest extends ApiTestCase
             $this->assertNull($value, 'Value was not deleted with its attribute');
         }
     }
+
+    public function testGetAttributesCollection(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        // Create test attributes with values
+        /** @var AttributeEntity $attribute1 */
+        $attribute1 = AttributeFactory::createOne([
+            'name' => 'Color',
+        ]);
+
+        $values1 = AttributeValueFactory::createMany(3, [
+            'attribute' => $attribute1,
+        ]);
+
+        /** @var AttributeEntity $attribute2 */
+        $attribute2 = AttributeFactory::createOne([
+            'name' => 'Size',
+        ]);
+
+        $values2 = AttributeValueFactory::createMany(2, [
+            'attribute' => $attribute2,
+        ]);
+
+        // When
+        $response = $client->request('GET', self::API_URL);
+
+        // Then
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $responseData = $response->toArray();
+        $this->assertCount(2, $responseData['member']);
+
+        // Verify both attributes are in the response
+        $foundColor = false;
+        $foundSize = false;
+
+        foreach ($responseData['member'] as $attribute) {
+            if ('Color' === $attribute['name']) {
+                $foundColor = true;
+                $this->assertEquals($attribute1->getId()->toString(), $attribute['id']);
+                $this->assertCount(3, $attribute['values']);
+
+                // Check color values
+                $values = array_map(fn ($v) => $v['value'], $attribute['values']);
+                foreach ($values1 as $value) {
+                    $this->assertContains($value->getValue(), $values);
+                }
+            }
+
+            if ('Size' === $attribute['name']) {
+                $foundSize = true;
+                $this->assertEquals($attribute2->getId()->toString(), $attribute['id']);
+                $this->assertCount(2, $attribute['values']);
+
+                // Check size values
+                $values = array_map(fn ($v) => $v['value'], $attribute['values']);
+                foreach ($values2 as $value) {
+                    $this->assertContains($value->getValue(), $values);
+                }
+            }
+        }
+
+        $this->assertTrue($foundColor, 'Color attribute not found in response');
+        $this->assertTrue($foundSize, 'Size attribute not found in response');
+    }
+
+    public function testGetAttributesCollectionWithParentChild(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        // Create parent attribute
+        /** @var AttributeEntity $parentAttribute */
+        $parentAttribute = AttributeFactory::createOne([
+            'name' => 'Product Features',
+        ]);
+
+        // Create child attribute
+        /** @var AttributeEntity $childAttribute */
+        $childAttribute = AttributeFactory::createOne([
+            'name' => 'Material',
+            'parent' => $parentAttribute,
+        ]);
+
+        $childAttributeValues = AttributeValueFactory::createMany(2, [
+            'attribute' => $childAttribute,
+        ]);
+
+        // When
+        $response = $client->request('GET', self::API_URL);
+
+        // Then
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $responseData = $response->toArray();
+        $this->assertGreaterThanOrEqual(2, count($responseData));
+
+        // Find the parent attribute
+        $foundParent = null;
+        $foundChild = null;
+
+        foreach ($responseData['member'] as $attribute) {
+            if ('Product Features' === $attribute['name']) {
+                $foundParent = $attribute;
+            }
+            if ('Material' === $attribute['name']) {
+                $foundChild = $attribute;
+            }
+        }
+
+        $this->assertNotNull($foundParent, 'Parent attribute not found in response');
+        $this->assertEquals($parentAttribute->getId()->toString(), $foundParent['id']);
+
+        $this->assertNotNull($foundChild, 'Child attribute not found in response');
+        $this->assertEquals($childAttribute->getId()->toString(), $foundChild['id']);
+        $this->assertEquals($parentAttribute->getId()->toString(), $foundChild['parentId']);
+        $this->assertCount(2, $foundChild['values']);
+
+        // Check child values
+        $values = array_map(fn ($v) => $v['value'], $foundChild['values']);
+        foreach ($childAttributeValues as $childAttributeValue) {
+            $this->assertContains($childAttributeValue->getValue(), $values);
+        }
+    }
+
+    public function testGetAttributesCollectionWithoutAdminRole(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
+        $client->loginUser($user);
+
+        // Create an attribute to ensure there's data in the database
+        AttributeFactory::createOne([
+            'name' => 'Feature',
+        ]);
+
+        // When
+        $client->request('GET', self::API_URL);
+
+        // Then
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testGetAttributesCollectionWithNoAttributes(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        // Clear any attributes created in previous tests
+        AttributeFactory::repository()->truncate();
+
+        // When
+        $response = $client->request('GET', self::API_URL);
+
+        // Then
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $responseData = $response->toArray();
+        $this->assertEmpty($responseData['member']);
+    }
 }

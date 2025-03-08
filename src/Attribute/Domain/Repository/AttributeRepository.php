@@ -12,4 +12,8 @@ use App\Common\Domain\Repository\Repository;
  */
 interface AttributeRepository extends Repository
 {
+    /**
+     * @return Attribute[]
+     */
+    public function findAttributes(): array;
 }
