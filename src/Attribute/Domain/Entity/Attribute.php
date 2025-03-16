@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
+use Gedmo\Mapping\Annotation\Slug;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
@@ -42,6 +43,9 @@ class Attribute extends BaseEntity
             'remove',
         ], orphanRemoval: true)]
         private Collection $values = new ArrayCollection(),
+        #[Column(type: 'string', length: 255)]
+        #[Slug(fields: ['name'], unique: true)]
+        private ?string $slug = null,
     ) {
         parent::__construct($this->id);
     }
@@ -91,5 +95,10 @@ class Attribute extends BaseEntity
     public function addChild(Attribute $attribute): void
     {
         $this->children->add($attribute);
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
     }
 }

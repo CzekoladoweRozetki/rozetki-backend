@@ -51,6 +51,7 @@ class AttributePostProcessor implements ProcessorInterface
             fn ($value) => new AttributeValue(
                 $value->id->toString(),
                 $value->value,
+                $value->slug,
                 $value->attributeId->toString(),
             ),
             $attribute->values
@@ -59,6 +60,7 @@ class AttributePostProcessor implements ProcessorInterface
         return new Attribute(
             $id->toString(),
             $attribute->name,
+            $attribute->slug,
             $values,
             $attribute->parentId?->toString(),
         );

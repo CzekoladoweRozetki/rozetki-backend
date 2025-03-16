@@ -26,10 +26,12 @@ class GetAttributesQueryHandler
             return new AttributeDTO(
                 id: $attribute->getId(),
                 name: $attribute->getName(),
+                slug: $attribute->getSlug(),
                 values: array_map(function ($value) {
                     return new AttributeValueDTO(
                         id: $value->getId(),
                         value: $value->getValue(),
+                        slug: $value->getSlug(),
                         attributeId: $value->getAttribute()->getId()
                     );
                 }, $attribute->getValues()->toArray()),

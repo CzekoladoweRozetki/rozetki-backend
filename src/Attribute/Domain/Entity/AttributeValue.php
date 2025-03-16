@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
+use Gedmo\Mapping\Annotation\Slug;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
@@ -29,13 +30,27 @@ class AttributeValue extends BaseEntity
         #[ManyToOne(targetEntity: Attribute::class, inversedBy: 'values')]
         #[JoinColumn(name: 'attribute_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
         private Attribute $attribute,
-        private mixed $value,
+        #[Column(type: 'string')]
+        private string $value,
         #[OneToMany(targetEntity: AttributeValue::class, mappedBy: 'parentValue')]
-        public Collection $childValues = new ArrayCollection(),
+        private Collection $childValues = new ArrayCollection(),
         #[ManyToOne(targetEntity: AttributeValue::class, inversedBy: 'childValues')]
-        public ?AttributeValue $parentValue = null,
+        private ?AttributeValue $parentValue = null,
+        #[Column(type: 'string')]
+        #[Slug(fields: ['value'], unique: true)]
+        private ?string $slug = null,
     ) {
         parent::__construct($id);
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
     }
 
     public function getAttribute(): Attribute

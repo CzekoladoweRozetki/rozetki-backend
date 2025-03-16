@@ -11,6 +11,7 @@ class AttributeValueDTO
     public function __construct(
         public Uuid $id,
         public string $value,
+        public string $slug,
         public Uuid $attributeId,
     ) {
     }

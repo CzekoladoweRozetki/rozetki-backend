@@ -19,6 +19,8 @@ class AttributeValue
         #[Groups(['attribute_value', 'attribute'])]
         public string $value,
         #[Groups(['attribute_value', 'attribute'])]
+        public string $slug,
+        #[Groups(['attribute_value', 'attribute'])]
         public string $attributeId,
     ) {
     }

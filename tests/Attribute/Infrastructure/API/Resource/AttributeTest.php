@@ -65,6 +65,7 @@ class AttributeTest extends ApiTestCase
 
         $this->assertNotNull($attribute);
         $this->assertEquals('Color', $attribute->getName());
+        $this->assertEquals('color', $attribute->getSlug());
         $this->assertCount(3, $attribute->getValues());
         $this->assertNull($attribute->getParent());
     }
@@ -227,6 +228,7 @@ class AttributeTest extends ApiTestCase
         $this->assertJsonContains([
             'id' => $attribute->getId()->toString(),
             'name' => 'Material',
+            'slug' => 'material',
         ]);
 
         $responseData = $response->toArray();
@@ -236,6 +238,7 @@ class AttributeTest extends ApiTestCase
         foreach ($responseData['values'] as $value) {
             $this->assertArrayHasKey('id', $value);
             $this->assertArrayHasKey('value', $value);
+            $this->assertArrayHasKey('slug', $value);
             $this->assertArrayHasKey('attributeId', $value);
             $this->assertEquals($attribute->getId()->toString(), $value['attributeId']);
         }

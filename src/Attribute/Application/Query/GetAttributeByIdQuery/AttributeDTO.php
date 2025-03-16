@@ -14,6 +14,7 @@ class AttributeDTO
     public function __construct(
         public Uuid $id,
         public string $name,
+        public string $slug,
         public array $values = [],
         public ?Uuid $parentId = null,
     ) {

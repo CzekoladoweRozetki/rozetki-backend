@@ -39,10 +39,12 @@ class AttributeSingleProvider implements ProviderInterface
         return new Attribute(
             $attribute->id->toString(),
             $attribute->name,
+            $attribute->slug,
             array_map(
                 fn ($value) => new AttributeValue(
                     $value->id->toString(),
                     $value->value,
+                    $value->slug,
                     $value->attributeId->toString(),
                 ),
                 $attribute->values

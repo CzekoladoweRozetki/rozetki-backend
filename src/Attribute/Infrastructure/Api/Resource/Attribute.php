@@ -37,6 +37,8 @@ class Attribute
         #[Groups(['attribute'])]
         public string $name,
         #[Groups(['attribute'])]
+        public string $slug,
+        #[Groups(['attribute'])]
         public array $values = [],
         #[Groups(['attribute'])]
         public ?string $parentId = null,
