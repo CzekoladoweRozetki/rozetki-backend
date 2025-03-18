@@ -17,6 +17,10 @@ readonly class ProductInputDTO
          * @var array<int, string>
          */
         public array $categories = [],
+        /**
+         * @var array<int, string>
+         */
+        public array $attributeValues = [],
     ) {
     }
 }

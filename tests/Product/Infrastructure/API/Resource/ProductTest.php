@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Product\Infrastructure\API\Resource;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Factory\AttributeFactory;
+use App\Factory\AttributeValueFactory;
 use App\Factory\CategoryFactory;
 use App\Factory\ProductFactory;
 use App\Factory\ProductVariantFactory;
@@ -111,6 +113,146 @@ class ProductTest extends ApiTestCase
         $this->assertEquals('First variant description', $variantsArray[0]->getDescription());
         $this->assertEquals('Variant 2', $variantsArray[1]->getName());
         $this->assertEquals('Second variant description', $variantsArray[1]->getDescription());
+    }
+
+    public function testCreateProductWithAttributes(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        // Create test attributes and values
+        $colorAttribute = AttributeFactory::createOne([
+            'name' => 'Color',
+        ]);
+
+        $redValue = AttributeValueFactory::createOne([
+            'attribute' => $colorAttribute,
+            'value' => 'Red',
+        ]);
+
+        $sizeAttribute = AttributeFactory::createOne([
+            'name' => 'Size',
+        ]);
+
+        $largeValue = AttributeValueFactory::createOne([
+            'attribute' => $sizeAttribute,
+            'value' => 'Large',
+        ]);
+
+        $payload = [
+            'name' => 'Test Product With Attributes',
+            'description' => 'This is a product with attribute values',
+            'attributeValues' => [
+                $redValue->getId()->toString(),
+                $largeValue->getId()->toString(),
+            ],
+        ];
+
+        // When
+        $response = $client->request('POST', self::API_URL, ['json' => $payload]);
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseStatusCodeSame(201);
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        self::assertJsonContains([
+            'name' => 'Test Product With Attributes',
+            'description' => 'This is a product with attribute values',
+        ]);
+
+        // Verify product was created in database with attributes
+        $productRepository = self::getContainer()->get(ProductRepository::class);
+        $product = $productRepository->findOneById(Uuid::fromString($content['id']));
+
+        $this->assertNotNull($product);
+        $productAttributes = $product->getAttributes();
+        $this->assertCount(2, $productAttributes);
+
+        // Check for attribute values in the product
+        $foundAttributeValues = [];
+        foreach ($productAttributes as $attribute) {
+            $foundAttributeValues[] = $attribute->getAttributeValueId()->toString();
+        }
+
+        $this->assertContains($redValue->getId()->toString(), $foundAttributeValues);
+        $this->assertContains($largeValue->getId()->toString(), $foundAttributeValues);
+    }
+
+    public function testCreateProductVariantWithAttributes(): void
+    {
+        // Given
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        // Create test attributes and values
+        $colorAttribute = AttributeFactory::createOne([
+            'name' => 'Color',
+        ]);
+
+        $redValue = AttributeValueFactory::createOne([
+            'attribute' => $colorAttribute,
+            'value' => 'Red',
+        ]);
+
+        $sizeAttribute = AttributeFactory::createOne([
+            'name' => 'Size',
+        ]);
+
+        $largeValue = AttributeValueFactory::createOne([
+            'attribute' => $sizeAttribute,
+            'value' => 'Large',
+        ]);
+
+        $payload = [
+            'name' => 'Product With Variant Attributes',
+            'description' => 'This product has variants with attributes',
+            'variants' => [
+                [
+                    'name' => 'Red Large Variant',
+                    'description' => 'This variant is red and large',
+                    'attributeValues' => [
+                        $redValue->getId()->toString(),
+                        $largeValue->getId()->toString(),
+                    ],
+                ],
+            ],
+        ];
+
+        // When
+        $response = $client->request('POST', self::API_URL, ['json' => $payload]);
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseStatusCodeSame(201);
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+
+        // Verify product was created with variant
+        $this->assertCount(1, $content['variants']);
+        $this->assertEquals('Red Large Variant', $content['variants'][0]['name']);
+
+        // Verify variant attributes in database
+        $productRepository = self::getContainer()->get(ProductRepository::class);
+        $product = $productRepository->findOneById(Uuid::fromString($content['id']));
+
+        $this->assertNotNull($product);
+        $variants = $product->getVariants();
+        $this->assertCount(1, $variants);
+
+        $variant = $variants->first();
+        $variantAttributes = $variant->getAttributes();
+        $this->assertCount(2, $variantAttributes);
+
+        // Check for attribute values in the variant
+        $foundAttributeValues = [];
+        foreach ($variantAttributes as $attribute) {
+            $foundAttributeValues[] = $attribute->getAttributeValueId()->toString();
+        }
+
+        $this->assertContains($redValue->getId()->toString(), $foundAttributeValues);
+        $this->assertContains($largeValue->getId()->toString(), $foundAttributeValues);
     }
 
     public function testGetSingleProduct(): void

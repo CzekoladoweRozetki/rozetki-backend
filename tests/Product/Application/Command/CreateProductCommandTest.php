@@ -6,6 +6,8 @@ namespace App\Tests\Product\Application\Command;
 
 use App\Common\Application\Event\EventBus;
 use App\Common\Infrastructure\Security\ExecutionContext;
+use App\Factory\AttributeFactory;
+use App\Factory\AttributeValueFactory;
 use App\Factory\CategoryFactory;
 use App\Product\Application\Command\CreateProduct\CreateProductCommand;
 use App\Product\Application\Command\CreateProduct\ProductVariantDTO;
@@ -122,6 +124,7 @@ class CreateProductCommandTest extends KernelTestCase
             'This is a product with categories',
             [],
             [$category1->getId()->toString(), $category2->getId()->toString()],
+            [],
             ExecutionContext::Internal
         );
 
@@ -140,5 +143,65 @@ class CreateProductCommandTest extends KernelTestCase
         $this->assertCount(2, $categories);
         $this->assertContains($category1->getId()->toString(), $categories);
         $this->assertContains($category2->getId()->toString(), $categories);
+    }
+
+    public function testCreateProductWithAttributes(): void
+    {
+        // Given
+        $productId = Uuid::v4();
+
+        // Create test attributes and values
+        $colorAttribute = AttributeFactory::createOne([
+            'name' => 'Color',
+        ]);
+
+        $redValue = AttributeValueFactory::createOne([
+            'attribute' => $colorAttribute,
+            'value' => 'Red',
+        ]);
+
+        $sizeAttribute = AttributeFactory::createOne([
+            'name' => 'Size',
+        ]);
+
+        $largeValue = AttributeValueFactory::createOne([
+            'attribute' => $sizeAttribute,
+            'value' => 'Large',
+        ]);
+
+        $command = new CreateProductCommand(
+            $productId,
+            'Test Product With Attributes',
+            'This is a product with attribute values',
+            [],
+            [],
+            [
+                $redValue->getId(),
+                $largeValue->getId(),
+            ],
+            ExecutionContext::Internal
+        );
+
+        // When
+        $this->commandBus->dispatch($command);
+
+        // Then
+        $productRepository = self::getContainer()->get(ProductRepository::class);
+        $product = $productRepository->find($productId);
+
+        $this->assertNotNull($product);
+        $this->assertEquals('Test Product With Attributes', $product->getName());
+
+        $attributes = $product->getAttributes();
+        $this->assertCount(2, $attributes);
+
+        // Check that both attribute values are associated with the product
+        $attributeValueIds = array_map(
+            fn ($attr) => $attr->getAttributeValueId()->toString(),
+            $attributes->toArray()
+        );
+
+        $this->assertContains($redValue->getId()->toString(), $attributeValueIds);
+        $this->assertContains($largeValue->getId()->toString(), $attributeValueIds);
     }
 }

@@ -6,6 +6,13 @@ namespace App\Product\Infrastructure\Api\DTO;
 
 final class ProductVariantInputDTO
 {
-    public string $name;
-    public string $description;
+    /**
+     * @param array<int, string> $attributeValues
+     */
+    public function __construct(
+        public string $name,
+        public string $description,
+        public array $attributeValues = [],
+    ) {
+    }
 }

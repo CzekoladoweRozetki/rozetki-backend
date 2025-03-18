@@ -33,10 +33,10 @@ migrate_database() {
     php bin/console doctrine:migrations:migrate --no-interaction $ENV_OPTION
 
 	# dont load fixtures for test environment
-	if [ -z "$ENVIRONMENT" ]; then
-		# Load fixtures
-		php bin/console doctrine:fixtures:load --no-interaction $ENV_OPTION
-	fi
+#	if [ -z "$ENVIRONMENT" ]; then
+#		# Load fixtures
+#		php bin/console doctrine:fixtures:load --no-interaction $ENV_OPTION
+#	fi
 }
 
 # Migrate the normal (default) database

@@ -22,6 +22,10 @@ readonly class CreateProductCommand extends Command
          * @var array<int, string>
          */
         public array $categories = [],
+        /**
+         * @var array<int, Uuid>
+         */
+        public array $attributeValues = [],
         public ExecutionContext $executionContext = ExecutionContext::Web,
     ) {
         parent::__construct($executionContext);

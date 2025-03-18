@@ -48,6 +48,8 @@ class CreateProductCommandHandler
             categories: $command->categories,
         );
 
+        $product->addAttributeValues($command->attributeValues);
+
         foreach ($command->variants as $variant) {
             $slug = $variant->slug;
             if (null === $variant->slug) {

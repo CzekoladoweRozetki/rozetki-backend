@@ -31,7 +31,14 @@ class ProductPostProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $variants = array_map(
-            fn ($variant) => new ProductVariantDTO($variant->name, $variant->description),
+            fn ($variant) => new ProductVariantDTO(
+                $variant->name,
+                $variant->description,
+                attributeValues: array_map(
+                    fn ($attributeValue) => Uuid::fromString($attributeValue),
+                    $variant->attributeValues
+                ),
+            ),
             $data->variants
         );
         $command = new CreateProductCommand(
@@ -40,6 +47,10 @@ class ProductPostProcessor implements ProcessorInterface
             $data->description,
             $variants,
             $data->categories,
+            array_map(
+                fn ($attributeValue) => Uuid::fromString($attributeValue),
+                $data->attributeValues
+            )
         );
 
         try {
