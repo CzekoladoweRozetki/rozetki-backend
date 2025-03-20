@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Catalog\Infrastructure\EventHandler;
 
+use App\Attribute\Application\Query\GetAttributeValuesQuery\AttributeValueDTO;
+use App\Attribute\Application\Query\GetAttributeValuesQuery\GetAttributeValuesQuery;
 use App\Catalog\Domain\Entity\CatalogProduct;
 use App\Catalog\Domain\Repository\CatalogProductRepository;
 use App\Category\Application\Query\GetCategories\CategoryDTO;
@@ -38,6 +40,37 @@ class ProductCreatedEventHandler
             $data = [];
             $data['categories'] = array_map(fn ($category) => ['name' => $category->name, 'slug' => $category->slug],
                 $categories);
+
+            // Attributes
+            $data['attributes'] = [];
+            $query = new GetAttributeValuesQuery(
+                array_map(
+                    fn ($attributeValue) => Uuid::fromString($attributeValue),
+                    $variant->attributeValues
+                ), ExecutionContext::Internal
+            );
+            /**
+             * @var AttributeValueDTO[] $attributesValues
+             */
+            $attributesValues = $this->queryBus->query($query);
+
+            foreach ($attributesValues as $attributeValue) {
+                if (!isset($data['attributes'][$attributeValue->attributeSlug])) {
+                    $data['attributes'][$attributeValue->attributeSlug] = [
+                        'name' => $attributeValue->attributeName,
+                        'slug' => $attributeValue->attributeSlug,
+                        'id' => $attributeValue->attributeId,
+                        'values' => array_map(
+                            fn ($attributeValue) => [
+                                'name' => $attributeValue->value,
+                                'slug' => $attributeValue->valueSlug,
+                                'id' => $attributeValue->id,
+                            ],
+                            $attributesValues
+                        ),
+                    ];
+                }
+            }
 
             $catalogProduct = new CatalogProduct(
                 Uuid::fromString($variant->id),

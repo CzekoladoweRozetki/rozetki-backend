@@ -45,7 +45,7 @@ class GetAttributesQueryTest extends KernelTestCase
             'attribute' => $attribute2,
         ]);
 
-        $query = new GetAttributesQuery(ExecutionContext::Internal);
+        $query = new GetAttributesQuery(null, ExecutionContext::Internal);
 
         // When
         /** @var AttributeDTO[] $result */
@@ -56,6 +56,7 @@ class GetAttributesQueryTest extends KernelTestCase
 
         // Find the Color attribute in results
         $colorAttribute = null;
+
         foreach ($result as $attribute) {
             if ('Color' === $attribute->name) {
                 $colorAttribute = $attribute;
@@ -92,7 +93,7 @@ class GetAttributesQueryTest extends KernelTestCase
             'attribute' => $childAttribute,
         ]);
 
-        $query = new GetAttributesQuery(ExecutionContext::Internal);
+        $query = new GetAttributesQuery(null, ExecutionContext::Internal);
 
         // When
         /** @var AttributeDTO[] $result */
@@ -141,7 +142,7 @@ class GetAttributesQueryTest extends KernelTestCase
         // Clear any attributes created in previous tests
         AttributeFactory::repository()->truncate();
 
-        $query = new GetAttributesQuery(ExecutionContext::Internal);
+        $query = new GetAttributesQuery([], ExecutionContext::Internal);
 
         // When
         /** @var AttributeDTO[] $result */

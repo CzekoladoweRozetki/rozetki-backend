@@ -13,7 +13,9 @@ use App\Common\Domain\Repository\Repository;
 interface AttributeRepository extends Repository
 {
     /**
+     * @param array<int, string>|null $ids
+     *
      * @return Attribute[]
      */
-    public function findAttributes(): array;
+    public function findAttributes(?array $ids = null): array;
 }

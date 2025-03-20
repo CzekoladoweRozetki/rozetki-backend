@@ -20,7 +20,11 @@ class GetAttributesQueryHandler
      */
     public function __invoke(GetAttributesQuery $query): array
     {
-        $attributes = $this->attributeRepository->findAttributes();
+        if (null === $query->ids) {
+            $attributes = $this->attributeRepository->findAttributes(null);
+        } else {
+            $attributes = $this->attributeRepository->findAttributes($query->ids);
+        }
 
         return array_map(function ($attribute) {
             return new AttributeDTO(

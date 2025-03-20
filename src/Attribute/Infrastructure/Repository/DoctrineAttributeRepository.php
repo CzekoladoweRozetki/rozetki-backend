@@ -28,8 +28,16 @@ class DoctrineAttributeRepository extends ServiceEntityRepository implements Att
     /**
      * @return Attribute[]
      */
-    public function findAttributes(): array
+    public function findAttributes(?array $ids = null): array
     {
-        return $this->findAll();
+        if (null === $ids) {
+            return $this->findAll();
+        }
+
+        $qb = $this->createQueryBuilder('a');
+        $qb->where($qb->expr()->in('a.id', ':ids'));
+        $qb->setParameter('ids', $ids);
+
+        return $qb->getQuery()->getResult();
     }
 }

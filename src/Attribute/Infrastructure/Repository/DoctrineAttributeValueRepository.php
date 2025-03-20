@@ -24,4 +24,13 @@ class DoctrineAttributeValueRepository extends ServiceEntityRepository implement
     {
         parent::__construct($registry, AttributeValue::class);
     }
+
+    public function findByAttributeValueIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('av');
+        $qb->where($qb->expr()->in('av.id', ':ids'));
+        $qb->setParameter('ids', $ids);
+
+        return $qb->getQuery()->getResult();
+    }
 }
