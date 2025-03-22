@@ -43,11 +43,17 @@ class ProductCreatedEventHandler
 
             // Attributes
             $data['attributes'] = [];
+            $productAttributeValueIds = array_map(
+                fn ($attributeValue) => Uuid::fromString($attributeValue),
+                $event->attributes
+            );
+            $VariantAttributeValueIds = array_map(
+                fn ($attributeValue) => Uuid::fromString($attributeValue),
+                $variant->attributeValues
+            );
+            $attributeValueIds = array_merge($productAttributeValueIds, $VariantAttributeValueIds);
             $query = new GetAttributeValuesQuery(
-                array_map(
-                    fn ($attributeValue) => Uuid::fromString($attributeValue),
-                    $variant->attributeValues
-                ), ExecutionContext::Internal
+                $attributeValueIds, ExecutionContext::Internal
             );
             /**
              * @var AttributeValueDTO[] $attributesValues

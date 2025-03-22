@@ -71,6 +71,10 @@ class CreateProductCommandHandler
             $product->getDescription(),
             array_map(fn ($variant) => ProductVariant::fromVariant($variant), $product->getVariants()->toArray()),
             $product->getCategories(),
+            array_map(
+                fn ($attribute) => $attribute->getId()->toString(),
+                $product->getAttributes()->toArray()
+            ),
         );
 
         $this->eventBus->dispatch($event);

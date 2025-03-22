@@ -58,6 +58,18 @@ class ProductCreatedEventHandlerTest extends KernelTestCase
             'value' => 'Large',
         ]);
 
+        $materialAttribute = AttributeFactory::createOne([
+            'name' => 'Fabric',
+        ]);
+        $metalValue = AttributeValueFactory::createOne([
+            'attribute' => $materialAttribute,
+            'value' => 'Metal',
+        ]);
+        $aluminiumValue = AttributeValueFactory::createOne([
+            'attribute' => $materialAttribute,
+            'value' => 'Aluminium',
+        ]);
+
         $event = new ProductCreatedEvent(
             $productId->toString(),
             'Test Product',
@@ -75,6 +87,7 @@ class ProductCreatedEventHandlerTest extends KernelTestCase
                 ),
             ],
             [$category1->getId()->toString(), $category2->getId()->toString()],
+            [$metalValue->getId()->toString(), $aluminiumValue->getId()->toString()]
         );
 
         // Act
@@ -138,5 +151,24 @@ class ProductCreatedEventHandlerTest extends KernelTestCase
             )
         );
         self::assertContains($largeValue->getId()->toString(), $valueIds);
+
+        // Check Material attribute
+        self::assertArrayHasKey($materialAttribute->getSlug(), $attributes);
+        $materialData = $attributes[$materialAttribute->getSlug()];
+        self::assertEquals('Fabric', $materialData['name']);
+        self::assertEquals($materialAttribute->getSlug(), $materialData['slug']);
+        self::assertEquals($materialAttribute->getId()->toString(), $materialData['id']);
+
+        // Check material values
+        $attributeValues = $materialData['values'];
+        $valueIds = array_map(
+            fn ($id) => $id->toString(),
+            array_column(
+                $attributeValues,
+                'id'
+            )
+        );
+        self::assertContains($metalValue->getId()->toString(), $valueIds);
+        self::assertContains($aluminiumValue->getId()->toString(), $valueIds);
     }
 }

@@ -12,6 +12,7 @@ readonly class ProductCreatedEvent extends Event
     /**
      * @param array<ProductVariant> $variants
      * @param array<int, string>    $categories
+     * @param array<int, string>    $attributes
      */
     public function __construct(
         public string $productId,
@@ -19,6 +20,7 @@ readonly class ProductCreatedEvent extends Event
         public string $description,
         public array $variants,
         public array $categories,
+        public array $attributes,
     ) {
     }
 
@@ -43,5 +45,13 @@ readonly class ProductCreatedEvent extends Event
     public function getVariants(): array
     {
         return $this->variants;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getCategories(): array
+    {
+        return $this->categories;
     }
 }
