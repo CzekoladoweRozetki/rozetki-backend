@@ -27,6 +27,7 @@ class CatalogProductCollectionProvider implements ProviderInterface
             page: isset($context['filters']['page']) ? (int) $context['filters']['page'] : 1,
             limit: isset($context['filters']['itemsPerPage']) ? (int) $context['filters']['itemsPerPage'] : 10,
             categorySlug: $context['filters']['c'] ?? null,
+            attributes: $context['filters']['attr'] ?? null,
         );
 
         $result = $this->queryBus->query($query);
@@ -37,6 +38,7 @@ class CatalogProductCollectionProvider implements ProviderInterface
                 name: $product->name,
                 description: $product->description,
                 categories: $product->categories,
+                attributes: $product->attributes,
             );
         }, $result);
     }

@@ -261,4 +261,129 @@ class CatalogProductTest extends ApiTestCase
         self::assertContains('Laptop', $names);
         self::assertNotContains('Novel', $names);
     }
+
+    public function testShouldFilterProductsByAttribute(): void
+    {
+        // Given
+        // Create attributes and values for testing
+        $colorAttribute = [
+            'name' => 'Color',
+            'slug' => 'color',
+            'id' => Uuid::v4()->toString(),
+            'values' => [
+                [
+                    'name' => 'Red',
+                    'slug' => 'red',
+                    'id' => Uuid::v4()->toString(),
+                ],
+                [
+                    'name' => 'Blue',
+                    'slug' => 'blue',
+                    'id' => Uuid::v4()->toString(),
+                ],
+            ],
+        ];
+
+        $sizeAttribute = [
+            'name' => 'Size',
+            'slug' => 'size',
+            'id' => Uuid::v4()->toString(),
+            'values' => [
+                [
+                    'name' => 'Small',
+                    'slug' => 'small',
+                    'id' => Uuid::v4()->toString(),
+                ],
+                [
+                    'name' => 'Medium',
+                    'slug' => 'medium',
+                    'id' => Uuid::v4()->toString(),
+                ],
+            ],
+        ];
+
+        // Create products with different attributes
+        CatalogProductFactory::createOne([
+            'id' => Uuid::v4(),
+            'name' => 'Red T-shirt Small',
+            'description' => 'A small red t-shirt',
+            'slug' => 'red-tshirt-small',
+            'data' => [
+                'attributes' => [
+                    'color' => $colorAttribute,
+                    'size' => $sizeAttribute,
+                ],
+            ],
+        ]);
+
+        CatalogProductFactory::createOne([
+            'id' => Uuid::v4(),
+            'name' => 'Blue Sweater Medium',
+            'description' => 'A medium blue sweater',
+            'slug' => 'blue-sweater-medium',
+            'data' => [
+                'attributes' => [
+                    'color' => array_replace_recursive($colorAttribute, [
+                        'values' => [$colorAttribute['values'][1]],  // Only blue
+                    ]),
+                    'size' => array_replace_recursive($sizeAttribute, [
+                        'values' => [$sizeAttribute['values'][1]],  // Only medium
+                    ]),
+                ],
+            ],
+        ]);
+
+        CatalogProductFactory::createOne([
+            'id' => Uuid::v4(),
+            'name' => 'Red Pants Medium',
+            'description' => 'Medium red pants',
+            'slug' => 'red-pants-medium',
+            'data' => [
+                'attributes' => [
+                    'color' => array_replace_recursive($colorAttribute, [
+                        'values' => [$colorAttribute['values'][0]],  // Only red
+                    ]),
+                    'size' => array_replace_recursive($sizeAttribute, [
+                        'values' => [$sizeAttribute['values'][1]],  // Only medium
+                    ]),
+                ],
+            ],
+        ]);
+
+        // When - filter by red color
+        $response = $this->client->request('GET', self::API_URL.'?attr[color]=red');
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertCount(2, $content['member']);
+
+        $names = array_map(fn ($item) => $item['name'], $content['member']);
+        self::assertContains('Red T-shirt Small', $names);
+        self::assertContains('Red Pants Medium', $names);
+        self::assertNotContains('Blue Sweater Medium', $names);
+
+        // When - filter by medium size
+        $response = $this->client->request('GET', self::API_URL.'?attr[size]=medium');
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertCount(3, $content['member']);
+
+        $names = array_map(fn ($item) => $item['name'], $content['member']);
+        self::assertContains('Blue Sweater Medium', $names);
+        self::assertContains('Red Pants Medium', $names);
+        self::assertContains('Red T-shirt Small', $names);
+
+        // When - filter by both red color and medium size
+        $response = $this->client->request('GET', self::API_URL.'?attr[color]=red&attr[size]=medium');
+        $content = $response->toArray();
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertCount(2, $content['member']);
+        self::assertEquals('Red Pants Medium', $content['member'][0]['name']);
+        self::assertEquals('Red T-shirt Small', $content['member'][1]['name']);
+    }
 }

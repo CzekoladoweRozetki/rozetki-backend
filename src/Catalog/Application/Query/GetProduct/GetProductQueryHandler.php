@@ -23,7 +23,7 @@ class GetProductQueryHandler
         $connection = $this->entityManager->getConnection();
 
         $sql = '
-            SELECT * FROM catalog_product
+            SELECT id, name, description, slug, data FROM catalog_product
             WHERE slug = :slug
         ';
 
@@ -40,6 +40,7 @@ class GetProductQueryHandler
         $data = (null !== $result['data']) ? json_decode($result['data'], true) : null;
         $data = $data ? $data : [];
         $result['categories'] = $data['categories'] ?? [];
+        $result['attributes'] = $data['attributes'] ?? [];
 
         return $result;
     }

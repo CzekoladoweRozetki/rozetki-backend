@@ -25,6 +25,7 @@ class GetProductsQueryHandler
             page: $query->page,
             limit: $query->limit,
             categorySlug: $query->categorySlug,
+            attributes: $query->attributes
         );
         $result = $stmt->executeQuery();
 
@@ -33,12 +34,14 @@ class GetProductsQueryHandler
         return array_map(function ($product) {
             $data = $product['data'] !== (null) ? json_decode($product['data'], true) : [];
             $data['categories'] = $data['categories'] ?? [];
+            $data['attributes'] = $data['attributes'] ?? [];
 
             return new CatalogProductDTO(
                 $product['name'],
                 $product['description'],
                 $product['slug'],
-                $data['categories']
+                $data['categories'],
+                $data['attributes']
             );
         },
             $productData);
