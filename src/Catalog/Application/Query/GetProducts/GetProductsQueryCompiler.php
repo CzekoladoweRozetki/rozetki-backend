@@ -17,7 +17,7 @@ class GetProductsQueryCompiler
     /**
      * Compiles a query to fetch products with search and filters.
      *
-     * @param array<string, mixed> $filters
+     * @param array<string, mixed>       $filters
      * @param array<string, string>|null $attributes
      */
     public function compile(
@@ -54,8 +54,8 @@ class GetProductsQueryCompiler
         // filter by attributes
         if ($attributes) {
             foreach ($attributes as $attributeSlug => $valueSlug) {
-                $paramKey = 'attr_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $attributeSlug);
-                $valueParamKey = 'value_' . $paramKey;
+                $paramKey = 'attr_'.preg_replace('/[^a-zA-Z0-9_]/', '_', $attributeSlug);
+                $valueParamKey = 'value_'.$paramKey;
 
                 // Check if any value within the attribute's values array has the matching slug
                 $where[] = "data->'attributes'->:$paramKey IS NOT NULL AND
@@ -79,10 +79,10 @@ class GetProductsQueryCompiler
 
         $sql = $baseQuery;
         if ($where) {
-            $sql .= ' WHERE ' . implode(' AND ', $where);
+            $sql .= ' WHERE '.implode(' AND ', $where);
         }
 
-        $sql .= ' ' . $orderBy . ' ' . $limitClause;
+        $sql .= ' '.$orderBy.' '.$limitClause;
 
         $stmt = $this->entityManager->getConnection()->prepare($sql);
         foreach ($params as $key => $value) {
@@ -100,7 +100,7 @@ class GetProductsQueryCompiler
     private function buildPartialTsQuery(string $phrase): string
     {
         $parts = preg_split('/\s+/', trim($phrase));
-        $parts = array_map(fn($p) => $p . ':*', $parts);
+        $parts = array_map(fn ($p) => $p.':*', $parts);
 
         return implode(' & ', $parts);
     }
