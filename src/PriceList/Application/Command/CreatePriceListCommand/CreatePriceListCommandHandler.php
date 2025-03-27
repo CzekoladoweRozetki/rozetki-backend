@@ -7,7 +7,9 @@ namespace App\PriceList\Application\Command\CreatePriceListCommand;
 use App\PriceList\Domain\Entity\PriceList;
 use App\PriceList\Domain\Repository\PriceListRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 class CreatePriceListCommandHandler
 {
     public function __construct(

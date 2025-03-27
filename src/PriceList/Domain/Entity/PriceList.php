@@ -35,7 +35,8 @@ class PriceList extends BaseEntity
         #[Column(type: 'string')]
         private string $name,
         #[Column(type: 'string')]
-        #[Assert\Currency()]
+        #[Assert\Currency]
+        #[Assert\NotBlank]
         private string $currency,
     ) {
         parent::__construct($id);

@@ -13,6 +13,7 @@ api_platform:
             - '%kernel.project_dir%/src/Catalog/Infrastructure/Api/Resource'
             - '%kernel.project_dir%/src/Category/Infrastructure/Api/Resource'
             - '%kernel.project_dir%/src/Attribute/Infrastructure/Api/Resource'
+            - '%kernel.project_dir%/src/PriceList/Infrastructure/Api/Resource'
     formats:
         json:
             mime_types: [ 'application/json' ]
