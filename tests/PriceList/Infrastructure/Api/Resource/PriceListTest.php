@@ -97,34 +97,31 @@ class PriceListTest extends ApiTestCase
         ]);
     }
 
-    //    public function testGetSinglePriceList(): void
-    //    {
-    //        $client = static::createClient();
-    //
-    //        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
-    //        $client->loginUser($user);
-    //
-    //        // First create a price list
-    //        $createResponse = $client->request('POST', self::API_URL, [
-    //            'json' => [
-    //                'name' => 'Premium Pricing',
-    //                'currency' => 'EUR',
-    //            ],
-    //        ]);
-    //
-    //        $priceListId = $createResponse->toArray()['id'];
-    //
-    //        // Then get the price list by ID
-    //        $response = $client->request('GET', self::API_URL . '/' . $priceListId);
-    //
-    //        // Verify the response
-    //        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-    //        $this->assertJsonContains([
-    //            'id' => $priceListId,
-    //            'name' => 'Premium Pricing',
-    //            'currency' => 'EUR',
-    //        ]);
-    //    }
+    public function testGetSinglePriceList(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        // First create a price list using the factory
+        $priceList = \App\Factory\PriceListFactory::createOne([
+            'name' => 'Premium Pricing',
+            'currency' => 'EUR',
+        ]);
+        $priceListId = $priceList->getId();
+
+        // Then get the price list by ID
+        $response = $client->request('GET', self::API_URL.'/'.$priceListId);
+
+        // Verify the response
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertJsonContains([
+            'id' => $priceListId->toString(),
+            'name' => 'Premium Pricing',
+            'currency' => 'EUR',
+        ]);
+    }
     //
     //    public function testDeletePriceList(): void
     //    {
