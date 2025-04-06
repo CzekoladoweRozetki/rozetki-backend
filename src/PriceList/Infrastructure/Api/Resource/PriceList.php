@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\PriceList\Infrastructure\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use App\PriceList\Infrastructure\Api\DTO\PriceListInputDTO;
+use App\PriceList\Infrastructure\Api\Processor\PriceListDeleteProcessor;
 use App\PriceList\Infrastructure\Api\Processor\PriceListPostProcessor;
 use App\PriceList\Infrastructure\Api\Provider\PriceListSingleProvider;
 
@@ -15,6 +17,7 @@ use App\PriceList\Infrastructure\Api\Provider\PriceListSingleProvider;
     operations: [
         new Post(input: PriceListInputDTO::class, processor: PriceListPostProcessor::class),
         new Get(provider: PriceListSingleProvider::class),
+        new Delete(provider: PriceListSingleProvider::class, processor: PriceListDeleteProcessor::class),
     ]
 )]
 class PriceList

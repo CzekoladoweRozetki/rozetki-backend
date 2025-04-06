@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\PriceList\Infrastructure\Api\Resource;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Factory\PriceListFactory;
 use App\Factory\UserFactory;
 use App\PriceList\Domain\Repository\PriceListRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,7 +106,7 @@ class PriceListTest extends ApiTestCase
         $client->loginUser($user);
 
         // First create a price list using the factory
-        $priceList = \App\Factory\PriceListFactory::createOne([
+        $priceList = PriceListFactory::createOne([
             'name' => 'Premium Pricing',
             'currency' => 'EUR',
         ]);
@@ -122,34 +123,53 @@ class PriceListTest extends ApiTestCase
             'currency' => 'EUR',
         ]);
     }
-    //
-    //    public function testDeletePriceList(): void
-    //    {
-    //        $client = static::createClient();
-    //
-    //        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
-    //        $client->loginUser($user);
-    //
-    //        // First create a price list
-    //        $createResponse = $client->request('POST', self::API_URL, [
-    //            'json' => [
-    //                'name' => 'Temporary Pricing',
-    //                'currency' => 'GBP',
-    //            ],
-    //        ]);
-    //
-    //        $priceListId = $createResponse->toArray()['id'];
-    //
-    //        // Delete the price list
-    //        $client->request('DELETE', self::API_URL . '/' . $priceListId);
-    //
-    //        // Verify deletion
-    //        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
-    //
-    //        // Verify it's gone from the database
-    //        $priceListRepository = self::getContainer()->get(PriceListRepository::class);
-    //        $deletedPriceList = $priceListRepository->findOneById(Uuid::fromString($priceListId));
-    //
-    //        $this->assertNull($deletedPriceList);
-    //    }
+
+    public function testDeletePriceList(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        $pricelist = PriceListFactory::createOne();
+
+        // Delete the price list
+        $client->request('DELETE', self::API_URL.'/'.$pricelist->getId()->toString());
+
+        // Verify deletion
+        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+
+        // Verify it's gone from the database
+        $priceListRepository = self::getContainer()->get(PriceListRepository::class);
+        $deletedPriceList = $priceListRepository->findOneById($pricelist->getId());
+
+        $this->assertNull($deletedPriceList);
+    }
+
+    public function testDeletePriceListRequiresAdminRole(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
+        $client->loginUser($user);
+
+        // First create a price list using the factory
+        $priceList = PriceListFactory::createOne([
+            'name' => 'Premium Pricing',
+            'currency' => 'EUR',
+        ]);
+        $priceListId = $priceList->getId();
+
+        // Try to delete the price list with non-admin user
+        $client->request('DELETE', self::API_URL.'/'.$priceListId);
+
+        // Verify access is denied
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+
+        // Verify the price list still exists
+        $priceListRepository = self::getContainer()->get(PriceListRepository::class);
+        $existingPriceList = $priceListRepository->findOneById($priceListId);
+
+        $this->assertNotNull($existingPriceList);
+    }
 }
