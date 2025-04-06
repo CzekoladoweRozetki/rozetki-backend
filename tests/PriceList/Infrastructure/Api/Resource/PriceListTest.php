@@ -172,4 +172,118 @@ class PriceListTest extends ApiTestCase
 
         $this->assertNotNull($existingPriceList);
     }
+
+    public function testUpdatePriceList(): void
+    {
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        $priceList = PriceListFactory::createOne([
+            'name' => 'Initial Name',
+            'currency' => 'USD',
+        ]);
+        $priceListId = $priceList->getId()->toString();
+
+        $newName = 'Updated Name';
+        $newCurrency = 'EUR';
+
+        $response = $client->request('PUT', self::API_URL.'/'.$priceListId, [
+            'json' => [
+                'id' => $priceListId,
+                'name' => $newName,
+                'currency' => $newCurrency,
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertJsonContains([
+            'id' => $priceListId,
+            'name' => $newName,
+            'currency' => $newCurrency,
+        ]);
+
+        // Verify the changes in the database
+        $priceListRepository = self::getContainer()->get(PriceListRepository::class);
+        $updatedPriceList = $priceListRepository->findOneById(Uuid::fromString($priceListId));
+
+        $this->assertNotNull($updatedPriceList);
+        $this->assertEquals($newName, $updatedPriceList->getName());
+        $this->assertEquals($newCurrency, $updatedPriceList->getCurrency());
+    }
+
+    public function testUpdatePriceListRequiresAdminRole(): void
+    {
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
+        $client->loginUser($user);
+
+        $priceList = PriceListFactory::createOne([
+            'name' => 'Initial Name',
+            'currency' => 'USD',
+        ]);
+        $priceListId = $priceList->getId()->toString();
+
+        $client->request('PUT', self::API_URL.'/'.$priceListId, [
+            'json' => [
+                'name' => 'Attempted Update Name',
+                'currency' => 'EUR',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+
+        // Verify the price list was not changed
+        $priceListRepository = self::getContainer()->get(PriceListRepository::class);
+        $existingPriceList = $priceListRepository->findOneById(Uuid::fromString($priceListId));
+
+        $this->assertNotNull($existingPriceList);
+        $this->assertEquals('Initial Name', $existingPriceList->getName());
+        $this->assertEquals('USD', $existingPriceList->getCurrency());
+    }
+
+    public function testUpdatePriceListWithInvalidCurrency(): void
+    {
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        $priceList = PriceListFactory::createOne([
+            'name' => 'Initial Name',
+            'currency' => 'USD',
+        ]);
+        $priceListId = $priceList->getId()->toString();
+
+        $client->request('PUT', self::API_URL.'/'.$priceListId, [
+            'json' => [
+                'id' => $priceListId,
+                'name' => 'Updated Name',
+                'currency' => 'INVALID',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertJsonContains([
+            'detail' => 'This value is not a valid currency.',
+        ]);
+    }
+
+    public function testUpdateNonExistentPriceList(): void
+    {
+        $client = static::createClient();
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $client->loginUser($user);
+
+        $nonExistentId = Uuid::v4()->toString();
+
+        $client->request('PUT', self::API_URL.'/'.$nonExistentId, [
+            'json' => [
+                'id' => $nonExistentId,
+                'name' => 'Updated Name',
+                'currency' => 'EUR',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
 }

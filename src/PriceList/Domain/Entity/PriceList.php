@@ -64,4 +64,10 @@ class PriceList extends BaseEntity
     {
         return $this->priceChanges;
     }
+
+    public function update(string $name, string $currency): void
+    {
+        $this->name = $name;
+        $this->currency = $currency;
+    }
 }

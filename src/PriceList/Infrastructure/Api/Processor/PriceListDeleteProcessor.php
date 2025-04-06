@@ -21,15 +21,12 @@ class PriceListDeleteProcessor implements ProcessorInterface
     ) {
     }
 
+    /**
+     * @param PriceList $data
+     */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $priceListId = $uriVariables['id'] ?? null;
-
-        if (null === $priceListId) {
-            return null;
-        }
-
-        $command = new DeletePriceListCommand(Uuid::fromString($priceListId));
+        $command = new DeletePriceListCommand(Uuid::fromString($data->id));
         $this->commandBus->dispatch($command);
 
         return null;
