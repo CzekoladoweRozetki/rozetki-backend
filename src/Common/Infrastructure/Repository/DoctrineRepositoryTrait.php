@@ -41,6 +41,6 @@ trait DoctrineRepositoryTrait
      */
     public function findOneById(Uuid $id): mixed
     {
-        return $this->find($id);
+        return $this->findOneBy(['id' => $id]);
     }
 }

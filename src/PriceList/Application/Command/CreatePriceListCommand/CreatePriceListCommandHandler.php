@@ -21,9 +21,9 @@ class CreatePriceListCommandHandler
     {
         $priceList = new PriceList(
             id: $command->id,
-            priceChanges: new ArrayCollection(),
             name: $command->name,
             currency: $command->currency,
+            prices: new ArrayCollection()
         );
 
         $this->priceListRepository->save($priceList);

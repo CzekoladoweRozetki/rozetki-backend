@@ -39,7 +39,7 @@ final class PriceListFactory extends PersistentProxyObjectFactory
             'id' => Uuid::v4(),
             'currency' => self::faker()->text(),
             'name' => self::faker()->text(),
-            'priceChanges' => new ArrayCollection(),
+            'prices' => new ArrayCollection(),
         ];
     }
 
